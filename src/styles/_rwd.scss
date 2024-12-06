@@ -1,0 +1,34 @@
+@use './_variables' as variables;
+
+// 修改 mixin 定義，使用正確的變數引用
+@mixin sm {
+	@media (min-width: variables.$breakpoint-sm) {
+		@content;
+	}
+}
+@mixin md {
+	@media (min-width: variables.$breakpoint-md) {
+		@content;
+	}
+}
+
+@mixin lg {
+	@media (min-width: variables.$breakpoint-lg) {
+		@content;
+	}
+}
+@mixin lgm {
+	@media (min-width: variables.$breakpoint-lgm) {
+		@content;
+	}
+}
+@mixin xl {
+	@media (min-width: variables.$breakpoint-xl) {
+		@content;
+	}
+}
+@mixin xxl {
+	@media (min-width: variables.$breakpoint-xxl) {
+		@content;
+	}
+}
