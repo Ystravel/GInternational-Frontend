@@ -1,12 +1,12 @@
 <template>
-  <v-container max-width="2500">
-    <v-row class="elevation-4 rounded-lg py-4 py-sm-8 px-1 px-sm-10 mt-2 mt-sm-10 mx-0 mx-sm-4 mx-md-10 mb-4 bg-white">
+  <v-container max-width="1920">
+    <v-row class="elevation-4 rounded-lg py-4 py-sm-8 px-1 px-sm-10 mt-2 mt-sm-6 mx-0 mx-sm-4 mx-md-4 mb-4 bg-white">
       <!-- 搜尋區塊 -->
       <v-col
         cols="12"
         class="ps-3 pb-6"
       >
-        <h3>員工管理</h3>
+        <h3>使用者管理</h3>
       </v-col>
 
       <v-col cols="12">
@@ -35,7 +35,7 @@
                     class="ps-lg-5"
                   >
                     <v-icon
-                      v-tooltip:start="'可搜尋員編、姓名、Email'"
+                      v-tooltip:start="'可搜尋使用者編號、姓名、Email'"
                       icon="mdi-information"
                       size="small"
                       color="purple-darken-4"
@@ -123,7 +123,7 @@
       >
         <v-card class="rounded-lg px-4 py-6">
           <div class="card-title px-4 py-3">
-            {{ dialog.id ? '員工資料編輯' : '新增員工' }}
+            {{ dialog.id ? '使用者資料編輯' : '新增使用者' }}
           </div>
 
           <v-card-text class="mt-3 pa-3">
@@ -178,6 +178,7 @@
               </v-col>
 
               <v-col
+                v-if="!isEditing"
                 cols="12"
                 sm="6"
                 md="4"
@@ -195,6 +196,7 @@
               </v-col>
 
               <v-col
+                v-if="!isEditing"
                 cols="12"
                 sm="6"
                 md="4"
@@ -270,10 +272,10 @@
     <!-- 確認刪除對話框 -->
     <ConfirmDeleteDialogWithTextField
       v-model="confirmDeleteDialog"
-      title="確認刪除員工"
-      :message="`確定要刪除員工「<span class='text-pink-lighten-1' style='font-weight: 800;'>${originalData?.name || ''}</span>」(<span class='text-pink-lighten-1' style='font-weight: 800;'> ${originalData?.userId || ''} </span>)嗎？ 此操作無法復原。`"
+      title="確認刪除使用者"
+      :message="`確定要刪除使用者「<span class='text-pink-lighten-1' style='font-weight: 800;'>${originalData?.name || ''}</span>」嗎？ 此操作無法復原。`"
       :expected-name="originalData?.name || ''"
-      input-label="員工姓名"
+      input-label="員工使用者"
       @confirm="deleteUser"
     />
   </v-container>
@@ -296,7 +298,7 @@ import { useRouter } from 'vue-router'
 // ===== 頁面設定 =====
 definePage({
   meta: {
-    title: '員工管理 | GInternational',
+    title: '使用者管理 | GInternational',
     login: true,
     roles: [UserRole.ADMIN]
   }
@@ -308,7 +310,7 @@ const user = useUserStore()
 const createSnackbar = useSnackbar()
 
 // ===== 響應式設定與螢幕斷點 =====
-const { smAndUp, mdAndUp, lgAndUp, name: currentBreakpoint } = useDisplay()
+const { smAndUp, mdAndUp, lgAndUp } = useDisplay()
 
 const buttonSize = computed(() => smAndUp.value ? 'default' : 'small')
 
@@ -333,10 +335,10 @@ const userSchema = yup.object({
   password: yup
     .string()
     .required('請輸入密碼')
-    .min(8, '密碼長度至少需要8個字元')
-    .matches(/[A-Z]/, '密碼需要包含至少一個大寫字母')
-    .matches(/[a-z]/, '密碼需要包含至少一個小寫字母')
-    .matches(/[0-9]/, '密碼需要包含至少一個數字'),
+    .min(8, '密碼長度至少需要8個字元'),
+        // .matches(/[A-Z]/, '密碼需要包含至少一個大寫字母')
+        // .matches(/[a-z]/, '密碼需要包含至少一個小寫字母')
+        // .matches(/[0-9]/, '密碼需要包含至少一個數字'),
   confirmPassword: yup
     .string()
     .required('請再次輸入密碼')
@@ -372,7 +374,7 @@ const tablePage = ref(1)
 const tableItems = ref([])
 const tableKey = ref(0)
 const tableHeaders = [
-  { title: '員工編號', align: 'left', sortable: true, key: 'userId' },
+  { title: '使用者編號', align: 'left', sortable: true, key: 'userId' },
   { title: '姓名', align: 'left', sortable: true, key: 'name' },
   { title: 'Email', align: 'left', sortable: true, key: 'email' },
   { title: '身分別', align: 'left', sortable: true, key: 'role' },
@@ -394,7 +396,6 @@ const dialog = ref({
 })
 
 const dialogWidth = computed(() => {
-  if (lgAndUp.value) return '1080'
   if (mdAndUp.value) return '800'
   if (smAndUp.value) return '600'
   return '100%'
@@ -473,19 +474,28 @@ const performSearch = async () => {
 const submit = handleSubmit(async (values) => {
   try {
     if (isEditing.value) {
-      const { password, confirmPassword, ...updateData } = values
+      // 編輯時直接選擇需要的欄位，而不是解構不需要的欄位
+      const updateData = {
+        email: values.email,
+        name: values.name,
+        role: values.role,
+        note: values.note,
+        // 加入其他需要更新的欄位
+      }
+      
       const { data } = await apiAuth.patch(`/user/${dialog.value.id}`, updateData)
       const index = tableItems.value.findIndex(item => item._id === dialog.value.id)
       if (index !== -1) {
         tableItems.value[index] = data.result
       }
     } else {
+      // 新增時傳送所有資料
       await apiAuth.post('/user', values)
       await tableLoadItems(true)
     }
 
     createSnackbar({
-      text: isEditing.value ? '員工資料更新成功' : '員工新增成功',
+      text: isEditing.value ? '使用者資料更新成功' : '使用者新增成功',
       snackbarProps: { color: 'teal-lighten-1' }
     })
 
@@ -517,7 +527,7 @@ const openDialog = async (item) => {
       email: item.email,
       name: item.name,
       role: item.role,
-      note: item.note
+      note: item.note,
     }
   } else {
     isEditing.value = false
@@ -542,7 +552,7 @@ const deleteUser = async () => {
     await tableLoadItems(true)
 
     createSnackbar({
-      text: '員工刪除成功',
+      text: '使用者刪除成功',
       snackbarProps: { color: 'teal-lighten-1' }
     })
   } catch (error) {
@@ -568,9 +578,13 @@ const hasChanges = computed(() => {
 })
 
 // ===== 監聽器 =====
-const debouncedQuickSearch = debounce((value) => {
+const debouncedQuickSearch = debounce(() => {
   tablePage.value = 1
+  tableLoading.value = true // 開始搜尋時顯示 loading
   performSearch()
+    .finally(() => {
+      tableLoading.value = false // 搜尋完成後關閉 loading
+    })
 }, 300)
 
 watch(quickSearchText, (newVal) => {

@@ -2,10 +2,10 @@
   <v-container max-width="2200">
     <v-row>
       <v-col
-        v-if="mdAndUp"
+        v-if="isLgmUp"
         md="3"
       >
-        <v-row class="elevation-4 rounded-lg pt-8 pb-10 px-1 px-sm-10 mt-2 mt-sm-6 mx-10 bg-white">
+        <v-row class="elevation-4 rounded-lg pt-12 pb-3 px-1 px-sm-10 mt-2 mt-sm-6 mx-10 bg-white">
           <v-card
             width="100%"
             elevation="0"
@@ -32,7 +32,7 @@
                   {{ user.name }}
                 </div>
                 <div class="text-subtitle-2 mb-4 opacity-70">
-                  <span v-tooltip:end="'員工編號'">{{ user.userId }}</span>
+                  <span v-tooltip:end="'使用者編號'">{{ user.userId }}</span>
                 </div>
                 <div
                   style="font-size: 15px; font-weight: 600;"
@@ -45,7 +45,7 @@
           </v-card>
         </v-row>
       </v-col>
-      <v-col md="9">
+      <v-col xl="9">
         <v-row class="elevation-4 rounded-lg pt-8 pb-6 px-1 px-sm-10 mt-2 mt-sm-6 mx-0 mx-sm-4 ms-xl-0 me-xl-10 mb-4 bg-white">
           <v-col
             cols="12"
@@ -180,7 +180,7 @@
                     sm="12"
                     class="align-self-center py-0"
                   >
-                    員工編號 :
+                    使用者編號 :
                   </v-col>
                   <v-col
                     cols="9"
@@ -342,7 +342,8 @@ import { useSnackbar } from 'vuetify-use-dialog'
 import { useDisplay } from 'vuetify'
 import { roleNames } from '@/enums/UserRole'
 
-const { mdAndUp } = useDisplay()
+const { mdAndUp, width } = useDisplay()
+const isLgmUp = computed(() => width.value >= 1500)
 
 const buttonSize = computed(() => mdAndUp.value ? 'default' : 'small')
 
@@ -467,7 +468,7 @@ watch(() => user.avatar, (newAvatar) => {
 
 <style lang="scss" scoped>
 @use '@/styles/_rwd' as rwd;
-@import '@/styles/settings.scss';
+@use '@/styles/settings' as *;
 
 .v-col-sm-12 {
   font-size: 13px;

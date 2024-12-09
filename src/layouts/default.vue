@@ -18,12 +18,12 @@
       >
         <v-img
           src="/src/assets/image/GInternational_Logo.png"
-          width="170"
+          width="176"
           class="ms-2 ms-sm-4"
         />
       </router-link>
       <v-spacer />
-      <v-icon
+      <!-- <v-icon
         icon="mdi-email-outline"
         size="22"
         color="purple-darken-4"
@@ -34,7 +34,7 @@
         size="22"
         color="purple-darken-4"
         class="me-8"
-      />
+      /> -->
       <v-btn
         v-if="user.isLogin && mdAndUp"
         prepend-icon="mdi-account-arrow-right"
@@ -409,18 +409,24 @@ const toggleGroup = (group) => {
 // ]
 
 const adminItems = [
+  // {
+  //   text: '人事管理',
+  //   icon: 'mdi-account-group',
+  //   roles: ['ADMIN',],
+  //   children: [
+  //     {
+  //       to: '/user',
+  //       text: '員工管理',
+  //       icon: 'mdi-account-cog',
+  //       roles: ['ADMIN']
+  //     }
+  //   ]
+  // },
   {
-    text: '人事管理',
-    icon: 'mdi-account-group',
-    roles: ['ADMIN',],
-    children: [
-      {
-        to: '/user',
-        text: '員工管理',
-        icon: 'mdi-account-cog',
-        roles: ['ADMIN']
-      }
-    ]
+    to: '/user',
+    text: '使用者管理',
+    icon: 'mdi-account-cog',
+    roles: ['ADMIN']
   },
   {
     to: '/formGenerator',
@@ -428,12 +434,12 @@ const adminItems = [
     icon: 'mdi-chart-box-outline',
     roles: ['ADMIN']
   },
-  {
-    to: '/auditLog',
-    text: '異動紀錄',
-    icon: 'mdi-history',
-    roles: ['ADMIN']
-  }
+  // {
+  //   to: '/auditLog',
+  //   text: '異動紀錄',
+  //   icon: 'mdi-history',
+  //   roles: ['ADMIN']
+  // }
 ]
 
 // 新增一個計算屬性來過濾可見的選單項目
@@ -552,7 +558,7 @@ watch(() => user.avatar, (newAvatar) => {
 
 <style lang="scss" scoped>
 .card-bg {
-  background: url(/src/assets/image/bg_profile_purpleflower.webp);
+  background: url(/src/assets/image/bg_profile.png);
   background-size: cover;
   transition: opacity 0.3s ease;
 

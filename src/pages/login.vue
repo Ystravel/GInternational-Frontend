@@ -20,7 +20,7 @@
           >
             <v-img
               src="/src/assets/image/GInternational_Logo.png"
-              max-width="200"
+              max-width="192"
             />
           </v-col>
 
@@ -61,12 +61,12 @@
               color="grey-darken-2"
               class="text-caption"
             />
-            <router-link
+            <!-- <router-link
               class="text-caption text-blue-grey-darken-2"
               to="./forgotPassword"
             >
               忘記密碼？
-            </router-link>
+            </router-link> -->
           </v-col>
           <v-col
             cols="12"
@@ -75,7 +75,7 @@
             <v-btn
               block
               elevation="2"
-              color="blue-grey-darken-2"
+              color="deep-purple-darken-2"
               type="submit"
               :loading="isSubmitting"
               :disabled="isSubmitting"
@@ -117,7 +117,7 @@
               <v-btn
                 block
                 elevation="2"
-                color="cyan-darken-3"
+                color="pink-darken-1"
                 :loading="isSubmitting"
                 :disabled="isSubmitting"
               >
@@ -299,7 +299,7 @@ onMounted(async () => {
 #background {
   width: 100%;
   height: 100%;
-  background-image: url(/src/assets/image/bg_login_1.webp);
+  background-image: url(/src/assets/image/bg_login.webp);
   background-size: cover;
   background-position: center;
 }
