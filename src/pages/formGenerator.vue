@@ -43,7 +43,7 @@
                 >
                   <v-btn
                     v-if="user.isAdmin || user.isSuperAdmin"
-                    color="purple-darken-4"
+                    color="blue-grey-darken-2"
                     variant="outlined"
                     prepend-icon="mdi-file-cog"
                     :size="buttonSize"
@@ -52,7 +52,7 @@
                     模板管理
                   </v-btn>
                   <v-btn
-                    color="purple-darken-4"
+                    color="blue-grey-darken-2"
                     variant="outlined"
                     prepend-icon="mdi-history"
                     :size="buttonSize"
@@ -69,23 +69,6 @@
                       class="d-flex align-center ps-3"
                     >
                       <v-select
-                        v-model="selectedTemplateType"
-                        :items="templateTypeOptions"
-                        label="選擇表單類型"
-                        item-title="title"
-                        item-value="value"
-                        variant="outlined"
-                        density="compact"
-                        clearable
-                        hide-details
-                        @update:model-value="handleTemplateTypeChange"
-                      />
-                    </v-col>
-                    <v-col
-                      cols="6"
-                      class="d-flex align-center ps-3"
-                    >
-                      <v-select
                         v-model="selectedTemplate"
                         :items="templateOptions"
                         label="選擇表單模板"
@@ -95,7 +78,7 @@
                         density="compact"
                         clearable
                         hide-details
-                        :disabled="!selectedTemplateType"
+                        :loading="false"
                         :hint="templateOptions.length === 0 ? '無可用的表單模板' : ''"
                         persistent-hint
                         @update:model-value="handleTemplateChange"
@@ -551,10 +534,10 @@
           style="min-width: 900px;"
         >
           <v-col cols="12">
-            <div class="card-title px-6 pt-6 text-deep-purple-darken-4 d-flex justify-space-between">
+            <div class="card-title px-6 pt-6 text-blue-grey-darken-2 d-flex justify-space-between">
               《 預覽及下載 》
               <v-btn
-                color="pink-darken-2"
+                color="teal-lighten-1"
                 :disabled="!previewReady || isDownloading"
                 :loading="isDownloading"
                 @click="downloadPDF"
@@ -731,7 +714,7 @@
                     <v-text-field
                       v-model="templateForm.name"
                       :error-messages="templateErrors.name"
-                      label="表單名稱*"
+                      label="表單報名*"
                       variant="outlined"
                       density="compact"
                       clearable
@@ -853,7 +836,7 @@
     >
       <v-card
         class="rounded-lg pa-4 "
-        min-height="920"
+        min-height="870"
       >
         <div class="d-flex justify-space-between align-center ps-6 pb-2">
           <div class="card-title">
@@ -886,7 +869,7 @@
                       variant="outlined"
                       density="compact"
                       clearable
-                      @update:model-value="handleHistoryTypeChange"
+                      @update:model-value="loadTemplateOptions"
                     />
                   </v-col>
                   <v-col
@@ -928,7 +911,7 @@
                     <v-row>
                       <v-col cols="6">
                         <v-btn
-                          color="grey-darken-1"
+                          color="blue-grey-darken-1"
                           block
                           class="me-3"
                           @click="resetHistorySearch"
@@ -988,9 +971,6 @@
                   客戶名稱
                 </th>
                 <th style="height: 36px;">
-                  專案名稱
-                </th>
-                <th style="height: 36px;">
                   創建日期
                 </th>
                 <th style="height: 36px;">
@@ -1012,7 +992,6 @@
                 <td>{{ history?.formTemplate?.name || '未知模板' }}</td>
                 <td>{{ history?.formNumber || '-' }}</td>
                 <td>{{ history?.clientName || '-' }}</td>
-                <td>{{ history?.projectName || '-' }}</td>
                 <td>{{ formatDate(history?.createdAt) }}</td>
                 <td>{{ history?.creator?.name || '未知' }} {{ history?.creator?.userId ? `(${history?.creator?.userId})` : '' }}</td>
                 <td class="text-center">
@@ -1144,7 +1123,6 @@ const templateRef = ref(null)
 const form = ref(null)
 const valid = ref(false)
 const deletingFormId = ref('')
-const selectedTemplateType = ref(null)
 
 // 模板相關
 const currentTemplate = shallowRef(null)
@@ -1234,7 +1212,7 @@ const editTemplateErrors = ref({
 const isSubmitting = ref(false)
 const formTemplates = ref([])
 
-// 添加新的響應變數
+// 添加新的響應式變數
 const dialogSelectedType = ref(null)
 
 // 修改 filteredTemplates 計算屬性
@@ -1302,7 +1280,7 @@ const addItem = () => {
     workDays: '',
     quantity: 1,
     unit: '份',
-    price: ''
+    price: 0
   })
 }
 
@@ -1367,11 +1345,6 @@ const searchHistory = async () => {
   } finally {
     isSearching.value = false
   }
-}
-
-const handlePageChange = (newPage) => {
-  currentPage.value = newPage
-  searchHistory()
 }
 
 // 添加防抖的快速搜尋處理
@@ -1756,8 +1729,6 @@ const loadDialogTemplates = async () => {
 }
 
 // 監聽
-
-
 watch(selectedTemplate, async (newVal) => {
   // 清空預覽相關的狀態
   currentTemplate.value = null
@@ -1897,36 +1868,43 @@ const histories = ref([])
 
 const historyTemplateOptions = ref([])
 
-// const loadTemplateOptions = async () => {
-//   if (!selectedTemplateType.value) {
-//     templateOptions.value = []
-//     return
-//   }
+const loadTemplateOptions = async () => {
+  try {
+    console.log('開始載入模板選項')
+    console.log('當前搜尋條件:', {
+      type: historySearch.value.type
+    })
 
-//   try {
-//     const params = { type: selectedTemplateType.value }
-//     const { data } = await apiAuth.get('/formTemplates/search', { params })
-//     if (data.success) {
-//       templateOptions.value = data.result.map(template => ({
-//         title: template.name,
-//         value: template._id
-//       }))
-//     } else {
-//       templateOptions.value = []
-//       createSnackbar({
-//         text: '無法獲取模板選項',
-//         snackbarProps: { color: 'red-lighten-1' }
-//       })
-//     }
-//   } catch (error) {
-//     console.error('載入模板選項失敗:', error)
-//     templateOptions.value = []
-//     createSnackbar({
-//       text: '載入模板選項失敗',
-//       snackbarProps: { color: 'red-lighten-1' }
-//     })
-//   }
-// }
+    // 清空現有選項
+    historyTemplateOptions.value = []
+    historySearch.value.formTemplate = ''
+
+    // 只有當類型有選擇時載入模板
+    if (historySearch.value.type) {
+      const params = {
+        type: historySearch.value.type
+      }
+
+      console.log('準備發送請求，參數:', params)
+      const { data } = await apiAuth.get('/formTemplates/search', { params })
+      console.log('收到回應:', data)
+
+      if (data.success) {
+        historyTemplateOptions.value = data.result.map(template => ({
+          title: template.name,
+          value: template._id
+        }))
+        console.log('處理後的選項:', historyTemplateOptions.value)
+      }
+    }
+  } catch (error) {
+    console.error('載入模板選項失敗:', error)
+    createSnackbar({
+      text: '載入模板選項失敗',
+      snackbarProps: { color: 'red-lighten-1' }
+    })
+  }
+}
 
 const closeHistoryDialog = () => {
   historyDialog.value.open = false
@@ -1956,32 +1934,6 @@ const openHistoryDialog = async () => {
     })
   }
 }
-
-// const loadHistoryTemplateOptions = async (type) => {
-//   try {
-//     const params = { type }
-//     const { data } = await apiAuth.get('/formTemplates/search', { params })
-//     if (data.success) {
-//       historyTemplateOptions.value = data.result.map(template => ({
-//         title: template.name,
-//         value: template._id
-//       }))
-//     } else {
-//       historyTemplateOptions.value = []
-//       createSnackbar({
-//         text: '無法獲取模板選項',
-//         snackbarProps: { color: 'red-lighten-1' }
-//       })
-//     }
-//   } catch (error) {
-//     console.error('載入模板選項失敗:', error)
-//     historyTemplateOptions.value = []
-//     createSnackbar({
-//       text: '載入模板選項失敗',
-//       snackbarProps: { color: 'red-lighten-1' }
-//     })
-//   }
-// }
 
 const formToDelete = ref(null)
 const confirmDeleteDialog = ref({
@@ -2034,13 +1986,14 @@ const formatDate = (date) => {
 }
 
 // 監聽類型變化
-watch(() => historySearch.value.type, async (newType) => {
-  if (newType) {
-    await loadHistoryTemplateOptions(newType)
-  } else {
+watch(
+  () => historySearch.value.type,
+  () => {
+    // 當類型變化時，清空模板選項和選擇的模板
+    historySearch.value.formTemplate = ''
     historyTemplateOptions.value = []
   }
-})
+)
 
 // 添加下載歷史 PDF 的方法
 const downloadHistoryPDF = async (history) => {
@@ -2101,82 +2054,6 @@ const confirmDownloadPDF = async () => {
     })
   } finally {
     confirmDownloadDialog.value.open = false
-  }
-}
-
-// 新增的函數
-const handleTemplateTypeChange = async (newType) => {
-  selectedTemplate.value = null // 清空表單模板的選擇
-  await loadTemplateOptions(newType) // 加載新的模板選項
-}
-
-// 修改 loadTemplateOptions 函數
-const loadTemplateOptions = async (type) => {
-  if (!type) {
-    templateOptions.value = []
-    return
-  }
-
-  try {
-    const params = { type }
-    const { data } = await apiAuth.get('/formTemplates/search', { params })
-    if (data.success) {
-      templateOptions.value = data.result.map(template => ({
-        title: template.name,
-        value: template._id
-      }))
-    } else {
-      templateOptions.value = []
-      createSnackbar({
-        text: '無法獲取模板選項',
-        snackbarProps: { color: 'red-lighten-1' }
-      })
-    }
-  } catch (error) {
-    console.error('載入模板選項失敗:', error)
-    templateOptions.value = []
-    createSnackbar({
-      text: '載入模板選項失敗',
-      snackbarProps: { color: 'red-lighten-1' }
-    })
-  }
-}
-
-// 新增的函數
-const handleHistoryTypeChange = async (newType) => {
-  historySearch.value.formTemplate = null // 清空表單模板的選擇
-  await loadHistoryTemplateOptions(newType) // 加載新的模板選項
-}
-
-// 修改 loadHistoryTemplateOptions 函數
-const loadHistoryTemplateOptions = async (type) => {
-  if (!type) {
-    historyTemplateOptions.value = []
-    return
-  }
-
-  try {
-    const params = { type }
-    const { data } = await apiAuth.get('/formTemplates/search', { params })
-    if (data.success) {
-      historyTemplateOptions.value = data.result.map(template => ({
-        title: template.name,
-        value: template._id
-      }))
-    } else {
-      historyTemplateOptions.value = []
-      createSnackbar({
-        text: '無法獲取模板選項',
-        snackbarProps: { color: 'red-lighten-1' }
-      })
-    }
-  } catch (error) {
-    console.error('載入模板選項失敗:', error)
-    historyTemplateOptions.value = []
-    createSnackbar({
-      text: '載入模板選項失敗',
-      snackbarProps: { color: 'red-lighten-1' }
-    })
   }
 }
 </script>
