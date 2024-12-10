@@ -43,7 +43,7 @@
                 >
                   <v-btn
                     v-if="user.isAdmin || user.isSuperAdmin"
-                    color="blue-grey-darken-2"
+                    color="deep-purple-darken-4"
                     variant="outlined"
                     prepend-icon="mdi-file-cog"
                     :size="buttonSize"
@@ -52,7 +52,7 @@
                     模板管理
                   </v-btn>
                   <v-btn
-                    color="blue-grey-darken-2"
+                    color="deep-purple-darken-4"
                     variant="outlined"
                     prepend-icon="mdi-history"
                     :size="buttonSize"
@@ -69,6 +69,23 @@
                       class="d-flex align-center ps-3"
                     >
                       <v-select
+                        v-model="selectedType"
+                        :items="templateTypeOptions"
+                        label="選擇表單類型"
+                        item-title="title"
+                        item-value="value"
+                        variant="outlined"
+                        density="compact"
+                        clearable
+                        hide-details
+                        @update:model-value="loadFormTemplateOptions"
+                      />
+                    </v-col>
+                    <v-col
+                      cols="6"
+                      class="d-flex align-center ps-3"
+                    >
+                      <v-select
                         v-model="selectedTemplate"
                         :items="templateOptions"
                         label="選擇表單模板"
@@ -78,7 +95,7 @@
                         density="compact"
                         clearable
                         hide-details
-                        :loading="false"
+                        :disabled="!selectedType"
                         :hint="templateOptions.length === 0 ? '無可用的表單模板' : ''"
                         persistent-hint
                         @update:model-value="handleTemplateChange"
@@ -534,10 +551,10 @@
           style="min-width: 900px;"
         >
           <v-col cols="12">
-            <div class="card-title px-6 pt-6 text-blue-grey-darken-2 d-flex justify-space-between">
+            <div class="card-title px-6 pt-6 text-grey-darken-2 d-flex justify-space-between">
               《 預覽及下載 》
               <v-btn
-                color="teal-lighten-1"
+                color="pink-darken-2"
                 :disabled="!previewReady || isDownloading"
                 :loading="isDownloading"
                 @click="downloadPDF"
@@ -578,10 +595,10 @@
     <v-dialog
       v-model="templateDialog.open"
       persistent
-      max-width="800"
+      max-width="880"
     >
-      <v-card class="rounded-lg pa-4">
-        <div class="card-title px-4 pb-2 d-flex justify-space-between align-center">
+      <v-card class="rounded-lg px-8 py-4">
+        <div class="card-title px-2 pb-2 d-flex justify-space-between align-center">
           表單模板管理
           <v-btn
             icon="mdi-close"
@@ -592,18 +609,20 @@
           />
         </div>
         <v-card-text class="ps-2 ">
-          <v-row>
+          <v-row class="">
             <v-col
-              cols="8"
-              class="px-5"
+              cols="7"
+              class="px-5 border rounded-lg"
             >
               <v-row>
-                <v-col class="card-subtitle text-blue-grey-darken-2">
-                  現有表單
+                <v-col class="card-subtitle text-blue-grey-darken-2 pt-3">
+                  現有表單模板
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="6">
+                <v-col
+                  cols="6"
+                >
                   <v-select
                     v-model="dialogSelectedType"
                     :items="templateTypeOptions"
@@ -613,7 +632,7 @@
                     variant="outlined"
                     density="compact"
                     clearable
-                    class="mb-4"
+                    class="mb-1"
                   />
                 </v-col>
               </v-row>
@@ -680,6 +699,7 @@
                 </v-chip>
               </div>
             </v-col>
+            <v-spacer />
             <v-col
               cols="4"
               class="border rounded-lg px-4 pt-4"
@@ -687,7 +707,7 @@
               <v-row>
                 <v-col
                   cols="12"
-                  class="card-subtitle text-blue-grey-darken-2 pb-5"
+                  class="card-subtitle text-blue-grey-darken-2 mb-4"
                 >
                   新增表單模板
                 </v-col>
@@ -832,11 +852,11 @@
     <!-- 表單歷史紀錄對話框 -->
     <v-dialog
       v-model="historyDialog.open"
-      max-width="1200"
+      max-width="1320"
     >
       <v-card
         class="rounded-lg pa-4 "
-        min-height="870"
+        min-height="920"
       >
         <div class="d-flex justify-space-between align-center ps-6 pb-2">
           <div class="card-title">
@@ -971,6 +991,9 @@
                   客戶名稱
                 </th>
                 <th style="height: 36px;">
+                  專案名稱
+                </th>
+                <th style="height: 36px;">
                   創建日期
                 </th>
                 <th style="height: 36px;">
@@ -992,6 +1015,7 @@
                 <td>{{ history?.formTemplate?.name || '未知模板' }}</td>
                 <td>{{ history?.formNumber || '-' }}</td>
                 <td>{{ history?.clientName || '-' }}</td>
+                <td>{{ history?.projectName || '-' }}</td>
                 <td>{{ formatDate(history?.createdAt) }}</td>
                 <td>{{ history?.creator?.name || '未知' }} {{ history?.creator?.userId ? `(${history?.creator?.userId})` : '' }}</td>
                 <td class="text-center">
@@ -1118,6 +1142,7 @@ const user = useUserStore()
 // 基本響應式變數
 const buttonSize = computed(() => smAndUp.value ? 'default' : 'small')
 const selectedTemplate = ref(null)
+const selectedType = ref(null)
 const templateOptions = ref([])
 const templateRef = ref(null)
 const form = ref(null)
@@ -1301,6 +1326,11 @@ const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.valu
 // 添加新的響應式變數
 const historyQuickSearch = ref('')
 
+const handlePageChange = (newPage) => {
+  currentPage.value = newPage
+  searchHistory()
+}
+
 // 修改 searchHistory 方法，整合快速搜尋
 const searchHistory = async () => {
   if (isSearching.value) return
@@ -1470,6 +1500,31 @@ const loadTemplates = async () => {
   } finally {
     // 確保無論如何都清空 loading 狀態
     templateOptions.value = templateOptions.value || []
+  }
+}
+
+const loadFormTemplateOptions = async () => {
+  if (!selectedType.value) {
+    templateOptions.value = []
+    selectedTemplate.value = null
+    return
+  }
+
+  try {
+    const params = { type: selectedType.value }
+    const { data } = await apiAuth.get('/formTemplates/search', { params })
+    if (data.success) {
+      templateOptions.value = data.result.map(template => ({
+        title: template.name,
+        value: template._id
+      }))
+    }
+  } catch (error) {
+    console.error('載入模板選項失敗:', error)
+    createSnackbar({
+      text: '載入模板選項失敗',
+      snackbarProps: { color: 'red-lighten-1' }
+    })
   }
 }
 
@@ -1995,6 +2050,19 @@ watch(
   }
 )
 
+watch(selectedType, (newVal) => {
+  // 當表單類型改變時，清空表單模板的選擇
+  selectedTemplate.value = null
+  
+  if (newVal) {
+    // 如果有選擇類型，則載入對應的模板選項
+    loadFormTemplateOptions()
+  } else {
+    // 如果清空類型，則清空模板選項
+    templateOptions.value = []
+  }
+})
+
 // 添加下載歷史 PDF 的方法
 const downloadHistoryPDF = async (history) => {
   try {
@@ -2073,6 +2141,15 @@ const confirmDownloadPDF = async () => {
 .v-select :deep(.v-field__input) {
   .v-select__selection-text {
     padding-bottom: 6px;
+  }
+}
+
+.v-table  {
+  :deep(tbody tr:nth-child(odd)) {
+    background-color: #f9ffff;
+  }
+  :deep(tbody tr:nth-child(even)) {
+    background-color: #ffffff;
   }
 }
 </style>

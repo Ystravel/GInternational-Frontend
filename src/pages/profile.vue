@@ -321,7 +321,7 @@
           取消
         </v-btn>
         <v-btn
-          color="purple-darken-4"
+          color="red-darken-4"
           variant="outlined"
           :size="buttonSize"
           :loading="isChangingPassword"

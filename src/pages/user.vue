@@ -17,7 +17,7 @@
                 <v-btn
                   prepend-icon="mdi-account-plus"
                   variant="outlined"
-                  color="purple-darken-3"
+                  color="deep-purple-darken-4"
                   @click="openDialog(null)"
                 >
                   新增使用者
@@ -38,7 +38,7 @@
                       v-tooltip:start="'可搜尋使用者編號、姓名、Email'"
                       icon="mdi-information"
                       size="small"
-                      color="purple-darken-4"
+                      color="deep-purple-darken-4"
                     />
                   </v-col>
                   <v-col>
@@ -321,31 +321,35 @@ const confirmDeleteDialog = ref(false)
 const headerProps = { class: 'header-bg' }
 
 // ===== 表單驗證架構 =====
-const userSchema = yup.object({
-  email: yup
-    .string()
-    .required('請輸入 email')
-    .email('請輸入正確的 email 格式'),
-  name: yup
-    .string()
-    .required('請輸入姓名'),
-  role: yup
-    .number()
-    .required('請選擇使用者身分別'),
-  password: yup
-    .string()
-    .required('請輸入密碼')
-    .min(8, '密碼長度至少需要8個字元'),
-        // .matches(/[A-Z]/, '密碼需要包含至少一個大寫字母')
-        // .matches(/[a-z]/, '密碼需要包含至少一個小寫字母')
-        // .matches(/[0-9]/, '密碼需要包含至少一個數字'),
-  confirmPassword: yup
-    .string()
-    .required('請再次輸入密碼')
-    .oneOf([yup.ref('password')], '密碼不一致'),
-  note: yup
-    .string()
-    .nullable()
+const userSchema = computed(() => {
+  const schema = {
+    email: yup
+      .string()
+      .required('請輸入 email')
+      .email('請輸入正確的 email 格式'),
+    name: yup
+      .string()
+      .required('請輸入姓名'),
+    role: yup
+      .number()
+      .required('請選擇使用者身分別'),
+    note: yup
+      .string()
+      .nullable()
+  }
+
+  if (!isEditing.value) {
+    schema.password = yup
+      .string()
+      .required('請輸入密碼')
+      .min(8, '密碼長度至少需要8個字元')
+    schema.confirmPassword = yup
+      .string()
+      .required('請再次輸入密碼')
+      .oneOf([yup.ref('password')], '密碼不一致')
+  }
+
+  return yup.object(schema)
 })
 
 // ===== 表單初始化與欄位設定 =====
@@ -623,7 +627,7 @@ const showConfirmPassword = ref(false)
 
 <style lang="scss" scoped>
 .v-data-table :deep(thead) {
-  background-color: #4A148C;
+  background-color: #4c0079;
   color: white;
 }
 

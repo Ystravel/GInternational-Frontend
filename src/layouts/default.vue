@@ -17,9 +17,8 @@
         class="d-flex"
       >
         <v-img
-          src="/src/assets/image/GInternational_Logo.png"
-          width="176"
-          class="ms-2 ms-sm-4"
+          src="/src/assets/image/GInternational_Logo_horizontal.png"
+          width="188"
         />
       </router-link>
       <v-spacer />
@@ -561,8 +560,10 @@ watch(() => user.avatar, (newAvatar) => {
   background: url(/src/assets/image/bg_profile.png);
   background-size: cover;
   transition: opacity 0.3s ease;
-
 }
+
+
+
 .card-blur {
   background: linear-gradient(135deg, rgb(105, 55, 105) 20%, rgba(255,255,255,0));
 }
