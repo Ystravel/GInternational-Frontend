@@ -32,7 +32,9 @@
                   {{ user.name }}
                 </div>
                 <div class="text-subtitle-2 mb-4 opacity-70">
-                  <span v-tooltip:end="'使用者編號'">{{ user.userId }}</span>
+                  <span v-tooltip:end="user.isAdmin ? '管理者編號' : '使用者編號'">
+                    {{ user.isAdmin ? user.adminId : user.userId }}
+                  </span>
                 </div>
                 <div
                   style="font-size: 15px; font-weight: 600;"
@@ -98,16 +100,16 @@
             </span>
           </v-col>
           <v-col>
-            <v-divider />
+            <v-divider class="mb-5" />
           </v-col>
-          <v-col
+          <!-- <v-col
             cols="12"
             class="mt-3 mb-6 text-center text-purple-darken-4"
           >
             <div class="info-title">
               《 基本資料 》
             </div>
-          </v-col>
+          </v-col> -->
           <v-col cols="12">
             <v-row class="text-purple-darken-4">
               <v-col
@@ -180,7 +182,7 @@
                     sm="12"
                     class="align-self-center py-0"
                   >
-                    使用者編號 :
+                    {{ user.isAdmin ? '管理者編號' : '使用者編號' }} :
                   </v-col>
                   <v-col
                     cols="9"
@@ -191,7 +193,7 @@
                       density="compact"
                       hide-details
                       readonly
-                      :model-value="user.userId"
+                      :model-value="user.isAdmin ? user.adminId : user.userId"
                     />
                   </v-col>
                 </v-row>
@@ -226,7 +228,7 @@
                 </v-row>
               </v-col>
 
-              <v-col
+              <!-- <v-col
                 class="py-0 mb-6"
                 cols="12"
                 sm="6"
@@ -253,7 +255,7 @@
                     />
                   </v-col>
                 </v-row>
-              </v-col>
+              </v-col> -->
             </v-row>
           </v-col>
         </v-row>

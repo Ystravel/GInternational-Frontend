@@ -112,7 +112,8 @@
                     cols="12"
                     class="ps-4 pb-0 pt-0"
                   >
-                    {{ user.userId }}
+                    <span>{{ user.userId }}</span>
+                    <span v-if="user.isAdmin">{{ user.adminId }}</span>
                   </v-col>
                   <v-col
                     cols="12"
@@ -124,26 +125,24 @@
               </v-card-text>
             </div>
           </v-card>
-          <!-- <template v-if="user.isLogin">
-            <v-list-item
-              v-for="userItem in userItems"
-              :key="userItem.to"
-              class="mt-2"
-              color="blue-grey-darken-3"
-              :to="userItem.to"
-            >
-              <template #prepend>
-                <v-icon>{{ userItem.icon }}</v-icon>
-              </template>
-              <v-list-item-title>{{ userItem.text }}</v-list-item-title>
-            </v-list-item>
-          </template> -->
-          <!-- <v-divider
-            v-if="!user.isUser"
+          <v-list-item
+            v-for="userItem in filteredUserItems"
+            :key="userItem.to"
+            :to="userItem.to"
+            color="blue-grey-darken-3"
+            class="mt-2"
+          >
+            <template #prepend>
+              <v-icon>{{ userItem.icon }}</v-icon>
+            </template>
+            <v-list-item-title>{{ userItem.text }}</v-list-item-title>
+          </v-list-item>
+          <v-divider
+            v-if="user.isAdmin"
             color="blue-grey-darken-4"
             opacity="0.3"
             class="my-2"
-          /> -->
+          />
           <template v-if="!user.isUser">
             <template
               v-for="item in filteredAdminItems"
@@ -272,24 +271,24 @@
               </v-card-text>
             </div>
           </v-card>
-          <!-- <template v-if="user.isLogin">
-            <v-list-item
-              v-for="userItem in userItems"
-              :key="userItem.to"
-              :to="userItem.to"
-              color="blue-grey-darken-3"
-              class="mt-4"
-            >
-              <template #prepend>
-                <v-icon>{{ userItem.icon }}</v-icon>
-              </template>
-              <v-list-item-title>{{ userItem.text }}</v-list-item-title>
-            </v-list-item>
-          </template> -->
-          <!-- <v-divider
-            v-if="!user.isUser"
+          <!-- 所有登入用戶都可以看到的功能選單 -->
+          <v-list-item
+            v-for="userItem in filteredUserItems"
+            :key="userItem.to"
+            :to="userItem.to"
+            color="blue-grey-darken-3"
             class="mt-4"
-          /> -->
+          >
+            <template #prepend>
+              <v-icon>{{ userItem.icon }}</v-icon>
+            </template>
+            <v-list-item-title>{{ userItem.text }}</v-list-item-title>
+          </v-list-item>
+          <!-- 管理者功能選單 -->
+          <v-divider
+            v-if="user.isAdmin"
+            class="mt-4"
+          />
           <template v-if="!user.isUser">
             <template
               v-for="item in filteredAdminItems"
@@ -402,10 +401,14 @@ const toggleGroup = (group) => {
   }
 }
 
-// const userItems = [
-//   { to: '/announcement', text: '所有公告', icon: 'mdi-bullhorn' },
-//   { to: '/ITService', text: 'IT 維修服務', icon: 'mdi-wrench' }
-// ]
+const userItems = [
+  {
+    to: '/formGenerator',
+    text: '表單產生器',
+    icon: 'mdi-chart-box-outline',
+    roles: ['ADMIN', 'MANAGER']
+  },
+]
 
 const adminItems = [
   // {
@@ -422,17 +425,18 @@ const adminItems = [
   //   ]
   // },
   {
+    to: '/admin',
+    text: '管理者管理',
+    icon: 'mdi-database-cog',
+    roles: ['ADMIN']
+  },
+  {
     to: '/user',
     text: '使用者管理',
     icon: 'mdi-account-cog',
     roles: ['ADMIN']
   },
-  {
-    to: '/formGenerator',
-    text: '表單產生器',
-    icon: 'mdi-chart-box-outline',
-    roles: ['ADMIN']
-  },
+  
   // {
   //   to: '/auditLog',
   //   text: '異動紀錄',
@@ -490,6 +494,28 @@ const filteredAdminItems = computed(() => {
     }
 
     return hasPermission
+  })
+})
+
+// 新增一個計算屬性來過濾一般功能選單
+const filteredUserItems = computed(() => {
+  return userItems.filter(item => {
+    // 如果沒有設定角色限制，所有人都可以看到
+    if (!item.roles || item.roles.length === 0) return true
+
+    // 檢查用戶是否有權限看到這個選單項目
+    return item.roles.some(role => {
+      switch (role) {
+        case 'ADMIN':
+          return user.isAdmin
+        case 'MANAGER':
+          return user.isManager
+        case 'USER':
+          return user.isUser
+        default:
+          return false
+      }
+    })
   })
 })
 

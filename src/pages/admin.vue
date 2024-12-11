@@ -6,7 +6,7 @@
         cols="12"
         class="ps-3 pb-6"
       >
-        <h3>使用者管理</h3>
+        <h3>管理者管理</h3>
       </v-col>
 
       <v-col cols="12">
@@ -20,7 +20,7 @@
                   color="deep-purple-darken-4"
                   @click="openDialog(null)"
                 >
-                  新增使用者
+                  新增管理者
                 </v-btn>
               </v-col>
               <v-col
@@ -35,7 +35,7 @@
                     class="ps-lg-5"
                   >
                     <v-icon
-                      v-tooltip:start="'可搜尋使用者編號、姓名、Email'"
+                      v-tooltip:start="'可搜尋管理者編號、姓名、Email'"
                       icon="mdi-information"
                       size="small"
                       color="deep-purple-darken-4"
@@ -81,13 +81,10 @@
             >
               <template #item="{ item, index }">
                 <tr :class="{ 'odd-row': index % 2 === 0, 'even-row': index % 2 !== 0 }">
-                  <td>{{ item.userId }}</td>
+                  <td>{{ item.adminId }}</td>
                   <td>{{ item.name }}</td>
                   <td v-if="lgAndUp">
                     {{ item.email }}
-                  </td>
-                  <td v-if="smAndUp">
-                    {{ getRoleTitle(item.role) }}
                   </td>
                   <td>{{ item.note }}</td>
                   <td class="d-flex align-center overflow-hidden h-25">
@@ -123,7 +120,7 @@
       >
         <v-card class="rounded-lg px-4 py-6">
           <div class="card-title px-4 py-3">
-            {{ dialog.id ? '使用者資料編輯' : '新增使用者' }}
+            {{ dialog.id ? '管理者資料編輯' : '新增管理者' }}
           </div>
 
           <v-card-text class="mt-3 pa-3">
@@ -135,13 +132,13 @@
                 md="4"
               >
                 <v-text-field
-                  v-model="userId.value.value"
-                  :error-messages="userId.errorMessage.value"
-                  label="使用者編號"
+                  v-model="adminId.value.value"
+                  :error-messages="adminId.errorMessage.value"
+                  label="*管理者編號"
                   type="text"
                   variant="outlined"
                   density="compact"
-                  clearable
+                  :disabled="!isEditing"
                 />
               </v-col>
 
@@ -174,23 +171,6 @@
                   variant="outlined"
                   density="compact"
                   clearable
-                />
-              </v-col>
-
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-select
-                  v-model="role.value.value"
-                  :error-messages="role.errorMessage.value"
-                  :items="roles"
-                  item-title="title"
-                  item-value="value"
-                  label="*權限"
-                  variant="outlined"
-                  density="compact"
                 />
               </v-col>
 
@@ -289,10 +269,10 @@
     <!-- 確認刪除對話框 -->
     <ConfirmDeleteDialogWithTextField
       v-model="confirmDeleteDialog"
-      title="確認刪除使用者"
-      :message="`確定要刪除使用者「<span class='text-pink-lighten-1' style='font-weight: 800;'>${originalData?.name || ''}</span>」嗎？ 此操作無法復原。`"
+      title="確認刪除管理者"
+      :message="`確定要刪除管理者「<span class='text-pink-lighten-1' style='font-weight: 800;'>${originalData?.name || ''}</span>」嗎？ 此操作無法復原。`"
       :expected-name="originalData?.name || ''"
-      input-label="員工使用者"
+      input-label="管理者"
       @confirm="deleteUser"
     />
   </v-container>
@@ -306,7 +286,7 @@ import { definePage } from 'vue-router/auto'
 import { useForm, useField } from 'vee-validate'
 import { useDisplay } from 'vuetify'
 import { useUserStore } from '@/stores/user'
-import UserRole, { roleNames } from '@/enums/UserRole'
+import UserRole from '@/enums/UserRole'
 import { useApi } from '@/composables/axios'
 import { useSnackbar } from 'vuetify-use-dialog'
 import ConfirmDeleteDialogWithTextField from '@/components/ConfirmDeleteDialogWithTextField.vue'
@@ -315,7 +295,7 @@ import { useRouter } from 'vue-router'
 // ===== 頁面設定 =====
 definePage({
   meta: {
-    title: '使用者管理 | GInternational',
+    title: '管理者管理 | GInternational',
     login: true,
     roles: [UserRole.ADMIN]
   }
@@ -347,18 +327,15 @@ const userSchema = computed(() => {
     name: yup
       .string()
       .required('請輸入姓名'),
-    role: yup
-      .number()
-      .required('請選擇使用者身分別'),
     note: yup
       .string()
       .nullable()
   }
 
   if (isEditing.value) {
-    schema.userId = yup
+    schema.adminId = yup
       .string()
-      .required('請輸入使用者編號')
+      .required('請輸入管理者編號')
   }
 
   if (!isEditing.value) {
@@ -381,7 +358,6 @@ const { handleSubmit, isSubmitting, resetForm } = useForm({
   initialValues: {
     email: '',
     name: '',
-    role: UserRole.USER,
     note: ''
   }
 })
@@ -389,23 +365,21 @@ const { handleSubmit, isSubmitting, resetForm } = useForm({
 // ===== 表單欄位定義 =====
 const email = useField('email')
 const name = useField('name')
-const role = useField('role')
 const note = useField('note')
 const password = useField('password')
 const confirmPassword = useField('confirmPassword')
-const userId = useField('userId')
+const adminId = useField('adminId')
 
 // ===== 表格相關設定 =====
 const tableItemsPerPage = ref(10)
-const tableSortBy = ref([{ key: 'userId', order: 'asc' }])
+const tableSortBy = ref([{ key: 'adminId', order: 'asc' }])
 const tablePage = ref(1)
 const tableItems = ref([])
 const tableKey = ref(0)
 const tableHeaders = [
-  { title: '使用者編號', align: 'left', sortable: true, key: 'userId' },
+  { title: '管理者編號', align: 'left', sortable: true, key: 'adminId' },
   { title: '姓名', align: 'left', sortable: true, key: 'name' },
   { title: 'Email', align: 'left', sortable: true, key: 'email' },
-  { title: '身分別', align: 'left', sortable: true, key: 'role' },
   { title: '備註', align: 'left', sortable: true, key: 'note' },
   { title: '操作', align: 'left', sortable: false, key: 'action' }
 ]
@@ -429,27 +403,13 @@ const dialogWidth = computed(() => {
   return '100%'
 })
 
-// ===== 角色選項 =====
-const roles = ref([
-  { value: UserRole.USER, title: roleNames[UserRole.USER] },    // 一般使用者
-  { value: UserRole.MANAGER, title: roleNames[UserRole.MANAGER] }  // 經理
-])
-
 // ===== 響應式表格抬頭設定 =====
 const filteredHeaders = computed(() => {
   if (lgAndUp.value) {
     return tableHeaders
   }
-  if (smAndUp.value) {
-    return tableHeaders.filter(header => header.key !== 'email')
-  }
-  return tableHeaders.filter(header => header.key !== 'email' && header.key !== 'role')
+  return tableHeaders.filter(header => header.key !== 'email')
 })
-
-// ===== 輔助函數 =====
-const getRoleTitle = (roleValue) => {
-  return roleNames[roleValue] || '未知'
-}
 
 // ===== API 相關函數 =====
 const tableLoadItems = async (reset) => {
@@ -465,10 +425,10 @@ const performSearch = async () => {
     const params = {
       page: tablePage.value,
       itemsPerPage: tableItemsPerPage.value,
-      sortBy: tableSortBy.value[0]?.key || 'userId',
+      sortBy: tableSortBy.value[0]?.key || 'adminId',
       sortOrder: tableSortBy.value[0]?.order || 'asc',
       quickSearch: quickSearchText.value,
-      excludeRole: 'true'
+      role: UserRole.ADMIN // 只搜尋管理者
     }
 
     const { data } = await apiAuth.get('/user/search', { params })
@@ -500,22 +460,25 @@ const performSearch = async () => {
 // ===== 表單操作函數 =====
 const submit = handleSubmit(async (values) => {
   try {
+    const submitData = {
+      ...values,
+      isAdmin: true, // 標記這是管理者
+      role: UserRole.ADMIN // 確保角色是管理者
+    }
+
     if (isEditing.value) {
-      const { data } = await apiAuth.patch(`/user/${dialog.value.id}`, values)
+      const { data } = await apiAuth.patch(`/user/${dialog.value.id}`, submitData)
       const index = tableItems.value.findIndex(item => item._id === dialog.value.id)
       if (index !== -1) {
         tableItems.value[index] = data.result
       }
     } else {
-      const submitData = Object.fromEntries(
-        Object.entries(values).filter(([key]) => key !== 'userId')
-      )
       await apiAuth.post('/user', submitData)
       await tableLoadItems(true)
     }
 
     createSnackbar({
-      text: isEditing.value ? '使用者資料更新成功' : '使用者新增成功',
+      text: isEditing.value ? '管理者資料更新成功' : '管理者新增成功',
       snackbarProps: { color: 'teal-lighten-1' }
     })
 
@@ -538,18 +501,16 @@ const openDialog = async (item) => {
     dialog.value.id = item._id
     email.value.value = item.email
     name.value.value = item.name
-    role.value.value = item.role
     note.value.value = item.note
-    userId.value.value = item.userId
+    adminId.value.value = item.adminId
     password.value.value = ''
     confirmPassword.value.value = ''
 
     originalData.value = {
       email: item.email,
       name: item.name,
-      role: item.role,
       note: item.note,
-      userId: item.userId
+      adminId: item.adminId
     }
   } else {
     isEditing.value = false
@@ -574,7 +535,7 @@ const deleteUser = async () => {
     await tableLoadItems(true)
 
     createSnackbar({
-      text: '使用者刪除成功',
+      text: '管理者刪除成功',
       snackbarProps: { color: 'teal-lighten-1' }
     })
   } catch (error) {
@@ -594,7 +555,7 @@ const hasChanges = computed(() => {
   if (!isEditing.value) return true
   if (!originalData.value) return false
 
-  return ['email', 'name', 'role', 'note', 'userId'].some(
+  return ['email', 'name', 'note', 'adminId'].some(
     key => originalData.value[key] !== eval(`${key}.value.value`)
   )
 })
@@ -602,10 +563,10 @@ const hasChanges = computed(() => {
 // ===== 監聽器 =====
 const debouncedQuickSearch = debounce(() => {
   tablePage.value = 1
-  tableLoading.value = true // 開始搜尋時顯示 loading
+  tableLoading.value = true
   performSearch()
     .finally(() => {
-      tableLoading.value = false // 搜尋完成後關閉 loading
+      tableLoading.value = false
     })
 }, 300)
 
@@ -630,7 +591,7 @@ const onUpdatePage = (page) => {
 
   if (tablePage.value !== page) {
     tablePage.value = page
-    localStorage.removeItem('userTablePage')
+    localStorage.removeItem('adminTablePage')
     tableLoadItems(false)
   }
 }
@@ -656,4 +617,4 @@ const showConfirmPassword = ref(false)
 .even-row {
   background-color: #f2f8fc;
 }
-</style> 
+</style>

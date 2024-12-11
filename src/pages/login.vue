@@ -16,7 +16,7 @@
         <v-row class="px-4">
           <v-col
             cols="12"
-            class="pt-9 pb-6 pe-8 ps-6 d-flex justify-center"
+            class="pt-10 pb-6 pe-8 ps-6 d-flex justify-center"
           >
             <v-img
               src="/src/assets/image/GInternational_Logo_horizontal.png"

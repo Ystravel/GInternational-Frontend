@@ -12,12 +12,14 @@ export const useUserStore = defineStore('user', () => {
   const email = ref('')
   const role = ref(UserRole.USER)
   const userId = ref('')
+  const adminId = ref('')
   const note = ref('')
   const avatar = ref('')
 
   // 計算屬性
   const isLogin = computed(() => token.value.length > 0)
   const isUser = computed(() => role.value === UserRole.USER)
+  const isManager = computed(() => role.value === UserRole.MANAGER)
   const isAdmin = computed(() => role.value === UserRole.ADMIN)
 
   // 登入
@@ -31,6 +33,7 @@ export const useUserStore = defineStore('user', () => {
         email.value = data.result.email
         role.value = data.result.role
         userId.value = data.result.userId
+        adminId.value = data.result.adminId
         note.value = data.result.note
         avatar.value = data.result.avatar
         await profile()
@@ -55,6 +58,7 @@ export const useUserStore = defineStore('user', () => {
         email.value = response.data.result.email
         role.value = response.data.result.role
         userId.value = response.data.result.userId
+        adminId.value = response.data.result.adminId
         note.value = response.data.result.note
         avatar.value = response.data.result.avatar
         return '登入成功'
@@ -77,6 +81,7 @@ export const useUserStore = defineStore('user', () => {
       name.value = data.result.name
       role.value = data.result.role
       userId.value = data.result.userId
+      adminId.value = data.result.adminId
       note.value = data.result.note
       avatar.value = data.result.avatar
     } catch (error) {
@@ -119,6 +124,7 @@ export const useUserStore = defineStore('user', () => {
     name.value = ''
     role.value = UserRole.USER
     userId.value = ''
+    adminId.value = ''
     note.value = ''
     avatar.value = ''
   }
@@ -130,12 +136,14 @@ export const useUserStore = defineStore('user', () => {
     name,
     role,
     userId,
+    adminId,
     note,
     avatar,
 
     // 計算屬性
     isLogin,
     isUser,
+    isManager,
     isAdmin,
 
     // 方法
