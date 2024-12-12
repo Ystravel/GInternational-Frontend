@@ -89,7 +89,9 @@
                   <td v-if="smAndUp">
                     {{ getRoleTitle(item.role) }}
                   </td>
-                  <td>{{ item.note }}</td>
+                  <td v-if="lgAndUp">
+                    {{ item.note }}
+                  </td>
                   <td>
                     <v-btn
                       icon
@@ -463,9 +465,9 @@ const filteredHeaders = computed(() => {
     return tableHeaders
   }
   if (smAndUp.value) {
-    return tableHeaders.filter(header => header.key !== 'email')
+    return tableHeaders.filter(header => header.key !== 'email' && header.key !== 'note')
   }
-  return tableHeaders.filter(header => header.key !== 'email' && header.key !== 'role')
+  return tableHeaders.filter(header => header.key !== 'email' && header.key !== 'role' && header.key !== 'note')
 })
 
 // ===== 輔助函數 =====
