@@ -90,7 +90,7 @@
                     {{ getRoleTitle(item.role) }}
                   </td>
                   <td>{{ item.note }}</td>
-                  <td class="d-flex align-center overflow-hidden h-25">
+                  <td>
                     <v-btn
                       icon
                       color="light-blue-darken-4"
@@ -102,6 +102,15 @@
                     >
                       <v-icon>mdi-pencil</v-icon>
                     </v-btn>
+                  </td>
+                  <td>
+                    <v-switch
+                      v-model="item.isActive"
+                      :color="item.isActive ? 'teal-darken-1' : 'grey-darken-4'"
+                      :label="item.isActive ? '啟用' : '停用'"
+                      hide-details
+                      @click.prevent="handleStatusChange(item)"
+                    />
                   </td>
                 </tr>
               </template>
@@ -292,8 +301,19 @@
       title="確認刪除使用者"
       :message="`確定要刪除使用者「<span class='text-pink-lighten-1' style='font-weight: 800;'>${originalData?.name || ''}</span>」嗎？ 此操作無法復原。`"
       :expected-name="originalData?.name || ''"
-      input-label="員工使用者"
+      input-label="使用者"
       @confirm="deleteUser"
+    />
+
+    <!-- 確認停用對話框 -->
+    <ConfirmDeleteDialog
+      v-model="showConfirmDialog"
+      title="確認停用帳號"
+      message="確定要停用此帳號嗎？停用後該用戶將無法登入系統。"
+      confirm-button-text="停用"
+      cancel-button-text="取消"
+      confirm-button-color="error"
+      @confirm="confirmStatusChange"
     />
   </v-container>
 </template>
@@ -311,6 +331,7 @@ import { useApi } from '@/composables/axios'
 import { useSnackbar } from 'vuetify-use-dialog'
 import ConfirmDeleteDialogWithTextField from '@/components/ConfirmDeleteDialogWithTextField.vue'
 import { useRouter } from 'vue-router'
+import ConfirmDeleteDialog from '@/components/ConfirmDeleteDialog.vue'
 
 // ===== 頁面設定 =====
 definePage({
@@ -407,7 +428,8 @@ const tableHeaders = [
   { title: 'Email', align: 'left', sortable: true, key: 'email' },
   { title: '身分別', align: 'left', sortable: true, key: 'role' },
   { title: '備註', align: 'left', sortable: true, key: 'note' },
-  { title: '操作', align: 'left', sortable: false, key: 'action' }
+  { title: '操作', align: 'left', sortable: false, key: 'action' },
+  { title: '帳號狀態', align: 'left', sortable: true, key: 'isActive' }
 ]
 
 const tableLoading = ref(true)
@@ -467,8 +489,7 @@ const performSearch = async () => {
       itemsPerPage: tableItemsPerPage.value,
       sortBy: tableSortBy.value[0]?.key || 'userId',
       sortOrder: tableSortBy.value[0]?.order || 'asc',
-      quickSearch: quickSearchText.value,
-      excludeRole: 'true'
+      quickSearch: quickSearchText.value
     }
 
     const { data } = await apiAuth.get('/user/search', { params })
@@ -641,6 +662,85 @@ const router = useRouter()
 // ===== 新增密碼相關的響應式變數 =====
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+
+// ===== 處理狀態變更 =====
+const showConfirmDialog = ref(false)
+const selectedUser = ref(null)
+
+// 處理狀態變更
+const handleStatusChange = (item) => {
+  // 如果是要停用帳號，則顯示確認對話框
+  if (item.isActive) {
+    selectedUser.value = item
+    showConfirmDialog.value = true
+  } else {
+    // 如果是要啟用帳號，直接執行
+    updateUserStatus(item, true)
+  }
+}
+
+// 確認停用帳號
+const confirmStatusChange = async () => {
+  if (selectedUser.value) {
+    await updateUserStatus(selectedUser.value, false)
+  }
+}
+
+// 更新用戶狀態
+const updateUserStatus = async (user, newStatus) => {
+  try {
+    const response = await apiAuth.patch(`/user/${user._id}`, {
+      isActive: newStatus
+    })
+
+    if (response.data.success) {
+      // 更新本地數據
+      const index = tableItems.value.findIndex(u => u._id === user._id)
+      if (index !== -1) {
+        tableItems.value[index].isActive = newStatus
+      }
+      
+      createSnackbar({
+        text: `帳號已${newStatus ? '啟用' : '停用'}`,
+        snackbarProps: { color: newStatus ? 'teal-lighten-1' : 'red-lighten-1' }
+      })
+    }
+  } catch (error) {
+    console.error('更新用戶狀態失敗:', error)
+    createSnackbar({
+      text: error?.response?.data?.message || '更新失敗',
+      snackbarProps: { color: 'error' }
+    })
+    // 恢復原狀態
+    const index = tableItems.value.findIndex(u => u._id === user._id)
+    if (index !== -1) {
+      tableItems.value[index].isActive = !newStatus
+    }
+  }
+}
+
+// 獲取用戶列表
+const fetchUsers = async () => {
+  tableLoading.value = true
+  try {
+    const response = await apiAuth.get('/user/all')
+    if (response.data.success) {
+      tableItems.value = response.data.result.data
+    }
+  } catch (error) {
+    console.error('獲取用戶列表失敗:', error)
+    createSnackbar({
+      message: error?.response?.data?.message || '獲取用戶列表失敗',
+      color: 'error'
+    })
+  } finally {
+    tableLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchUsers()
+})
 </script>
 
 <style lang="scss" scoped>

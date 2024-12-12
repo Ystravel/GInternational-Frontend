@@ -8,7 +8,7 @@
       class="position-fixed"
     >
       <v-app-bar-nav-icon
-        class="ms-4"
+        class="ms-3"
         color="blue-grey-darken-3"
         @click.stop="toggleDrawer"
       />
@@ -19,6 +19,7 @@
         <v-img
           src="/src/assets/image/GInternational_Logo_horizontal.png"
           width="188"
+          class="ms-1"
         />
       </router-link>
       <v-spacer />

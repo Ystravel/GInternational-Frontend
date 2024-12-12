@@ -184,7 +184,7 @@ const email = useField('email')
 const password = useField('password')
 
 // Google Client ID - 請替換成你的 Client ID
-const googleClientId = '890205288379-2bm447qt1rj7jkooc7luqej83if9inp4.apps.googleusercontent.com'
+const googleClientId = '276416380558-pgfrsn7bb9fot96r8s3kbeu9cqghind3.apps.googleusercontent.com'
 
 
 const googleLoginCallback = async (response) => {

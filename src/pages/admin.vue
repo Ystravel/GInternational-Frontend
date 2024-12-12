@@ -427,11 +427,10 @@ const performSearch = async () => {
       itemsPerPage: tableItemsPerPage.value,
       sortBy: tableSortBy.value[0]?.key || 'adminId',
       sortOrder: tableSortBy.value[0]?.order || 'asc',
-      quickSearch: quickSearchText.value,
-      role: UserRole.ADMIN // 只搜尋管理者
+      quickSearch: quickSearchText.value
     }
 
-    const { data } = await apiAuth.get('/user/search', { params })
+    const { data } = await apiAuth.get('/user/search/admins', { params })
     if (data.success) {
       tableItems.value = data.result.data
       tableItemsLength.value = data.result.totalItems
