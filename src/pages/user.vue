@@ -493,13 +493,14 @@ const performSearch = async () => {
     }
 
     const { data } = await apiAuth.get('/user/search', { params })
+    
     if (data.success) {
       tableItems.value = data.result.data
       tableItemsLength.value = data.result.totalItems
     }
   } catch (error) {
-    console.error('搜索失败:', error)
-    const errorMessage = error?.response?.data?.message || '搜索失败'
+    console.error('搜索失敗:', error)
+    const errorMessage = error?.response?.data?.message || '搜索失敗'
     if (error?.response?.status === 401) {
       await user.logout()
       router.push('/login')
@@ -718,29 +719,6 @@ const updateUserStatus = async (user, newStatus) => {
     }
   }
 }
-
-// 獲取用戶列表
-const fetchUsers = async () => {
-  tableLoading.value = true
-  try {
-    const response = await apiAuth.get('/user/all')
-    if (response.data.success) {
-      tableItems.value = response.data.result.data
-    }
-  } catch (error) {
-    console.error('獲取用戶列表失敗:', error)
-    createSnackbar({
-      message: error?.response?.data?.message || '獲取用戶列表失敗',
-      color: 'error'
-    })
-  } finally {
-    tableLoading.value = false
-  }
-}
-
-onMounted(() => {
-  fetchUsers()
-})
 </script>
 
 <style lang="scss" scoped>
