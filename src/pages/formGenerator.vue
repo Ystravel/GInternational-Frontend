@@ -1028,16 +1028,20 @@
                   >
                     <v-icon>mdi-file-pdf-box</v-icon>
                   </v-btn>
-                  <v-btn
-                    icon
-                    variant="plain"
-                    color="red-lighten-1"
-                    :loading="deletingFormId === history._id"
-                    :disabled="deletingFormId === history._id"
-                    @click="deleteHistory(history)"
+                  <template
+                    v-if="history.creator?.userId === (user?.adminId || user?.userId)"
                   >
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
+                    <v-btn
+                      icon
+                      variant="plain"
+                      color="red-lighten-1"
+                      :loading="deletingFormId === history._id"
+                      :disabled="deletingFormId === history._id"
+                      @click="deleteHistory(history)"
+                    >
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </template>
                 </td>
               </tr>
               <tr v-if="!histories.length">
@@ -1138,6 +1142,10 @@ const { smAndUp } = useDisplay()
 const { apiAuth } = useApi()
 const createSnackbar = useSnackbar()
 const user = useUserStore()
+
+// 在 setup 中加入
+console.log('完整的 user store:', user)
+console.log('user store 的所有屬性:', Object.keys(user))
 
 // 基本響應式變數
 const buttonSize = computed(() => smAndUp.value ? 'default' : 'small')
