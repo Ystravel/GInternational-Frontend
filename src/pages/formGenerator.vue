@@ -1029,7 +1029,11 @@
                     <v-icon>mdi-file-pdf-box</v-icon>
                   </v-btn>
                   <template
-                    v-if="history.creator?.userId === (user?.adminId || user?.userId)"
+                    v-if="(() => {
+                      const currentId = user.isAdmin ? user.adminId : user.userId
+                      const creatorId = history.creator?.role === 2 ? history.creator?.adminId : history.creator?.userId
+                      return creatorId === currentId
+                    })()"
                   >
                     <v-btn
                       icon
@@ -1142,10 +1146,6 @@ const { smAndUp } = useDisplay()
 const { apiAuth } = useApi()
 const createSnackbar = useSnackbar()
 const user = useUserStore()
-
-// 在 setup 中加入
-console.log('完整的 user store:', user)
-console.log('user store 的所有屬性:', Object.keys(user))
 
 // 基本響應式變數
 const buttonSize = computed(() => smAndUp.value ? 'default' : 'small')
