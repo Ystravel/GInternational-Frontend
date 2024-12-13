@@ -61,12 +61,12 @@
               color="grey-darken-2"
               class="text-caption"
             />
-            <!-- <router-link
+            <router-link
               class="text-caption text-blue-grey-darken-2"
-              to="./forgotPassword"
+              to="/forgotPassword"
             >
               忘記密碼？
-            </router-link> -->
+            </router-link>
           </v-col>
           <v-col
             cols="12"
@@ -75,7 +75,7 @@
             <v-btn
               block
               elevation="2"
-              color="deep-purple-darken-2"
+              color="purple-lighten-1"
               type="submit"
               :loading="isSubmitting"
               :disabled="isSubmitting"
@@ -117,7 +117,7 @@
               <v-btn
                 block
                 elevation="2"
-                color="pink-darken-1"
+                color="pink-lighten-1"
                 :loading="isSubmitting"
                 :disabled="isSubmitting"
               >

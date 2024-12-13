@@ -112,6 +112,47 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  // 忘記密碼
+  const forgotPassword = async (email) => {
+    try {
+      const { data } = await api.post('/user/forgot-password', { email })
+
+      if (!data.success) {
+        throw new Error(data.message || '發送重設密碼郵件失敗')
+      }
+
+      return {
+        success: true,
+        message: data.message || '重設密碼郵件已發送，請檢查您的信箱'
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || '發送重設密碼郵件失敗'
+      throw new Error(errorMessage)
+    }
+  }
+
+  // 重設密碼
+  const resetPassword = async (token, newPassword) => {
+    try {
+      const { data } = await api.post('/user/reset-password', {
+        resetPasswordToken: token,
+        password: newPassword
+      })
+
+      if (!data.success) {
+        throw new Error(data.message || '重設密碼失敗')
+      }
+
+      return {
+        success: true,
+        message: data.message || '密碼重設成功'
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || '重設密碼失敗'
+      throw new Error(errorMessage)
+    }
+  }
+
   // 登出
   const logout = async () => {
     try {
@@ -151,7 +192,9 @@ export const useUserStore = defineStore('user', () => {
     logout,
     profile,
     googleLogin,
-    changePassword
+    changePassword,
+    forgotPassword,
+    resetPassword
   }
 }, {
   persist: {
