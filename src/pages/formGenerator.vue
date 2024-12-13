@@ -1017,7 +1017,7 @@
                 <td>{{ history?.clientName || '-' }}</td>
                 <td>{{ history?.projectName || '-' }}</td>
                 <td>{{ formatDate(history?.createdAt) }}</td>
-                <td>{{ history?.creator?.name || '未知' }} {{ history?.creator?.userId ? `(${history?.creator?.userId})` : '' }}</td>
+                <td>{{ history?.creator?.name || '未知' }} {{ history?.creator?.role === 2 ? `(${history?.creator?.adminId})` : `(${history?.creator?.userId})` }}</td>
                 <td class="text-center">
                   <v-btn
                     icon
