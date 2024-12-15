@@ -266,7 +266,7 @@
   <!-- 修改密碼對話框 -->
   <v-dialog
     v-model="showPasswordDialog"
-    max-width="360"
+    max-width="320"
   >
     <v-card>
       <div class="card-title ps-6 py-6">
@@ -309,6 +309,10 @@
             class="mb-4"
             @update:model-value="confirmPasswordError = ''"
             @click:append-inner="showConfirmPassword = !showConfirmPassword"
+          />
+          <v-btn
+            type="submit"
+            style="display: none"
           />
         </v-form>
       </v-card-text>

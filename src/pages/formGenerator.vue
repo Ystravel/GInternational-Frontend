@@ -1170,9 +1170,9 @@ const templateComponents = {
 
 // 表單類型選項
 const templateTypeOptions = [
-  { title: '報價單', value: 'quotation' },
-  { title: '請購單', value: 'purchase' },
-  { title: '請假單', value: 'leave' }
+  { title: '報價單', value: 'quotation' }
+  // { title: '請購單', value: 'purchase' },
+  // { title: '請假單', value: 'leave' }
 ]
 
 // 表單資料
