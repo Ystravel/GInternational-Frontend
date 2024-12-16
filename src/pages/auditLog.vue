@@ -155,7 +155,7 @@
                         class="ps-0"
                       >
                         <v-btn
-                          color="blue-grey-darken-1"
+                          color="cyan-darken-2"
                           prepend-icon="mdi-magnify"
                           :loading="tableLoading"
                           block
