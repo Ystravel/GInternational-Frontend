@@ -130,7 +130,7 @@
             v-for="userItem in filteredUserItems"
             :key="userItem.to"
             :to="userItem.to"
-            color="blue-grey-darken-3"
+            color="grey-darken-3"
             class="mt-2"
           >
             <template #prepend>
@@ -140,7 +140,7 @@
           </v-list-item>
           <v-divider
             v-if="user.isAdmin"
-            color="blue-grey-darken-4"
+            color="grey-darken-3"
             opacity="0.3"
             class="my-2"
           />
@@ -158,7 +158,7 @@
                 <template #activator="{ props }">
                   <v-list-item
                     v-bind="props"
-                    color="blue-grey-darken-3"
+                    color="grey-darken-3"
                   >
                     <template #prepend>
                       <v-icon>{{ item.icon }}</v-icon>
@@ -171,7 +171,7 @@
                   v-for="child in item.children"
                   :key="child.to"
                   :to="child.to"
-                  color="blue-grey-darken-3"
+                  color="grey-darken-3"
                 >
                   <template #prepend>
                     <v-icon>{{ child.icon }}</v-icon>
@@ -184,7 +184,8 @@
               <v-list-item
                 v-else
                 :to="item.to"
-                color="blue-grey-darken-3"
+                color="grey-darken-3"
+
                 class="mt-2"
               >
                 <template #prepend>
@@ -277,7 +278,7 @@
             v-for="userItem in filteredUserItems"
             :key="userItem.to"
             :to="userItem.to"
-            color="blue-grey-darken-3"
+            color="grey-darken-3"
             class="mt-4"
           >
             <template #prepend>
@@ -300,7 +301,7 @@
                 <template #activator="{ props }">
                   <v-list-item
                     v-bind="props"
-                    color="blue-grey-darken-3"
+                    color="grey-darken-3"
                   >
                     <template #prepend>
                       <v-icon>{{ item.icon }}</v-icon>
@@ -313,7 +314,7 @@
                   v-for="child in item.children"
                   :key="child.to"
                   :to="child.to"
-                  color="blue-grey-darken-3"
+                  color="grey-darken-3"
                 >
                   <template #prepend>
                     <v-icon>{{ child.icon }}</v-icon>
@@ -326,7 +327,7 @@
               <v-list-item
                 v-else
                 :to="item.to"
-                color="blue-grey-darken-3"
+                color="grey-darken-3"
                 class="mt-2"
               >
                 <template #prepend>
@@ -342,7 +343,7 @@
           <v-list-item
             v-if="user.isLogin"
             class="mt-4"
-            color="blue-grey-darken-3"
+            color="grey-darken-3"
             @click="logout"
           >
             <template #prepend>

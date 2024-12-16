@@ -1755,10 +1755,19 @@ const deleteTemplate = async () => {
         id: '',
         name: ''
       }
+      // 重新載入模板列表
+      await loadDialogTemplates()
     }
   } catch (error) {
+    let errorMessage = '刪除失敗'
+    // 處理特定的錯誤情況
+    if (error.response?.status === 409) {
+      errorMessage = '此表單模板有表單使用中，無法刪除'
+    } else {
+      errorMessage = error.response?.data?.message || '刪除失敗'
+    }
     createSnackbar({
-      text: error.response?.data?.message || '刪除失敗',
+      text: errorMessage,
       snackbarProps: { color: 'red-lighten-1' }
     })
   }
