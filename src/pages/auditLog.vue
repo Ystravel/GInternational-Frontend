@@ -32,6 +32,7 @@
                       label="操作人員"
                       return-object
                       :item-props="item => ({
+                        key: item._id,
                         title: formatUserDisplay(item),
                         value: item
                       })"
@@ -87,6 +88,54 @@
                     sm="6"
                     lg="12"
                   >
+                    <v-autocomplete
+                      v-model="searchCriteria.targetId"
+                      v-model:search-input="targetSearchInput"
+                      :items="targetSuggestions"
+                      :loading="targetLoading"
+                      :label="targetType ? '操作對象' : '操作對象(請先選擇資料類型)'"
+                      :disabled="!targetType"
+                      return-object
+                      :item-props="item => ({
+                        key: item._id || item.name,
+                        title: formatTargetDisplay(item),
+                        value: item
+                      })"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      clearable
+                      @update:search="handleTargetSearch"
+                      @click:clear="clearTargetSearch"
+                    >
+                      <template #selection="{ item }">
+                        {{ formatTargetDisplay(item.raw) }}
+                      </template>
+                      <template
+                        v-if="smAndUp"
+                        #append-inner
+                      >
+                        <v-tooltip
+                          location="top"
+                          close-delay="200"
+                        >
+                          <template #activator="{ props }">
+                            <v-icon
+                              v-bind="props"
+                              icon="mdi-information"
+                              size="18"
+                            />
+                          </template>
+                          輸入使用者編號、表單編號或姓名查詢
+                        </v-tooltip>
+                      </template>
+                    </v-autocomplete>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    lg="12"
+                  >
                     <v-select
                       v-model="searchCriteria.action"
                       :items="actionOptions"
@@ -99,22 +148,7 @@
                       clearable
                     />
                   </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    lg="12"
-                  >
-                    <v-text-field
-                      v-model="searchCriteria.quickSearch"
-                      label="操作對象"
-                      variant="outlined"
-                      density="compact"
-                      hide-details
-                      clearable
-                      placeholder="輸入操作對象名稱/編號"
-                      prepend-inner-icon="mdi-magnify"
-                    />
-                  </v-col>
+                  
                   <v-col
                     cols="12"
                     sm="6"
@@ -173,7 +207,7 @@
         </v-row>
       </v-col>
 
-      <!-- 表格區塊 -->
+      <!-- 表格區 -->
       <v-col
         cols="12"
         lg="8"
@@ -374,6 +408,10 @@ const operatorSuggestions = ref([])
 const operatorLoading = ref(false)
 const operatorSearchInput = ref('')
 
+const targetSuggestions = ref([])
+const targetLoading = ref(false)
+const targetSearchInput = ref('')
+
 // 表格相關
 const tableLoading = ref(false)
 const tableItems = ref([])
@@ -385,6 +423,7 @@ const tableSortBy = ref([{ key: 'createdAt', order: 'desc' }])
 // 搜尋條件
 const searchCriteria = ref({
   operatorId: null,
+  targetId: null,
   action: '',
   targetModel: '',
   dateRange: [],
@@ -442,7 +481,7 @@ const fieldTranslations = {
   name: '姓名',
   email: '電子郵件',
   role: '權限',
-  userId: '員工編號',
+  userId: '使用者編號',
   adminId: '管理員編號',
   formNumber: '表單編號',
   clientName: '客戶名稱',
@@ -522,7 +561,7 @@ const formatChanges = (item) => {
         else if (typeof value === 'boolean') {
           changes.push(`${fieldTranslations[key]}: ${formatBoolean(value)}`)
         }
-        // 處理空值或 undefined
+        // 處���空值或 undefined
         else {
           changes.push(`${fieldTranslations[key]}: ${value || '(無)'}`)
         }
@@ -586,19 +625,89 @@ const clearOperatorSearch = () => {
   searchCriteria.value.operatorId = null
 }
 
+// 添加 targetType 計算屬性
+const targetType = computed(() => searchCriteria.value.targetModel)
+
+// 修改 handleTargetSearch 函數
+const handleTargetSearch = debounce(async (text) => {
+  console.log('搜尋開始，輸入文字:', text)
+  console.log('目前選擇的 targetType:', targetType.value)
+  
+  if (!text || !targetType.value) return
+  targetLoading.value = true
+  try {
+    let endpoint = ''
+    let params = {}
+
+    switch (targetType.value) {
+      case 'users':
+        endpoint = '/user/suggestions'
+        params = { search: text }
+        break
+      case 'forms':
+        endpoint = '/forms/suggestions'
+        params = { search: text }
+        break
+      case 'formTemplates':
+        endpoint = '/formTemplates/suggestions'
+        params = { search: text }
+        break
+      default:
+        return
+    }
+
+    console.log('準備發送請求到:', endpoint, '參數:', params)
+    const { data } = await apiAuth.get(endpoint, { params })
+    console.log('API 回應:', data)
+    
+    if (data.success) {
+      if (targetType.value === 'formTemplates') {
+        // 確保回傳的資料格式正確
+        targetSuggestions.value = data.result.map(item => ({
+          _id: item._id,
+          name: item.name
+        }))
+      } else {
+        targetSuggestions.value = data.result
+      }
+    }
+  } catch (error) {
+    console.error('搜尋操作對象失敗:', error)
+    console.error('錯誤詳情:', {
+      message: error?.message,
+      response: error?.response?.data
+    })
+    createSnackbar({
+      text: error?.response?.data?.message || '搜尋操作對象失敗',
+      snackbarProps: { color: 'error' }
+    })
+    targetSuggestions.value = []
+  } finally {
+    targetLoading.value = false
+  }
+}, 300)
+
+const clearTargetSearch = () => {
+  targetSearchInput.value = ''
+  targetSuggestions.value = []
+  searchCriteria.value.targetId = null
+}
+
 const resetSearch = () => {
   searchCriteria.value = {
     operatorId: null,
+    targetId: null,
     action: '',
     targetModel: '',
-    dateRange: [],
-    quickSearch: ''
+    dateRange: []
   }
   clearOperatorSearch()
+  clearTargetSearch()
   performSearch()
 }
 
 const performSearch = async () => {
+  console.log('開始執行搜尋，搜尋條件:', searchCriteria.value)
   tableLoading.value = true
   try {
     const params = {
@@ -623,9 +732,6 @@ const performSearch = async () => {
     if (searchCriteria.value.targetModel) {
       params.targetModel = searchCriteria.value.targetModel
     }
-    if (searchCriteria.value.quickSearch) {
-      params.quickSearch = searchCriteria.value.quickSearch
-    }
     
     // 處理日期範圍
     if (searchCriteria.value.dateRange && searchCriteria.value.dateRange.length > 0) {
@@ -633,7 +739,6 @@ const performSearch = async () => {
       startDate.setHours(0, 0, 0, 0)
       params.startDate = startDate.toISOString()
 
-      // 如果只選擇了一天，結束日期就是同一天的結束時間
       const endDate = searchCriteria.value.dateRange.length > 1 
         ? new Date(searchCriteria.value.dateRange[searchCriteria.value.dateRange.length - 1])
         : new Date(searchCriteria.value.dateRange[0])
@@ -641,15 +746,31 @@ const performSearch = async () => {
       params.endDate = endDate.toISOString()
     }
 
+    // 處理操作對象
+    if (searchCriteria.value.targetId) {
+      console.log('處理操作對象:', searchCriteria.value.targetId)
+      if (searchCriteria.value.targetModel === 'formTemplates') {
+        // 如果是表單模板，使用 _id
+        params.targetId = searchCriteria.value.targetId._id
+      } else {
+        params.targetId = searchCriteria.value.targetId._id
+      }
+    }
+
+    console.log('發送搜尋請求，參數:', params)
     const { data } = await apiAuth.get('/auditLogs', { params })
+    console.log('搜尋回應:', data)
+    
     if (data.success) {
       tableItems.value = data.result.data
       tableItemsLength.value = data.result.totalItems
-    } else {
-      throw new Error(data.message)
     }
   } catch (error) {
     console.error('搜尋失敗:', error)
+    console.error('錯誤詳情:', {
+      message: error?.message,
+      response: error?.response?.data
+    })
     createSnackbar({
       text: error?.response?.data?.message || '搜尋失敗',
       snackbarProps: { color: 'error' }
@@ -688,6 +809,31 @@ const formatUserDisplay = (user) => {
   }
   return `${user.name} (${user.userId || ''})`
 }
+
+// 修改 formatTargetDisplay 函數
+const formatTargetDisplay = (item) => {
+  if (!item) return ''
+  
+  switch (targetType.value) {
+    case 'users':
+      if (item.adminId) {
+        return `${item.name} (${item.adminId})`
+      }
+      return `${item.name}${item.userId ? ` (${item.userId})` : ''}`
+    case 'forms':
+      return `${item.formNumber}${item.clientName ? ` - ${item.clientName}` : ''}`
+    case 'formTemplates':
+      return item.name || ''
+    default:
+      return ''
+  }
+}
+
+// 監聽資料類型變更
+watch(() => searchCriteria.value.targetModel, () => {
+  // 當資料類型改變時，清空操作對象
+  clearTargetSearch()
+})
 
 // 添加日期驗證監聽
 watch(
