@@ -428,7 +428,7 @@ const filteredHeaders = computed(() => {
   }
   if (!mdAndUp.value) {
     return tableHeaders.filter(header =>
-      ['createdAt', 'operatorId', 'targetModel', 'action', 'actions'].includes(header.key)
+      ['createdAt', 'operator.name', 'targetModel', 'action', 'actions'].includes(header.key)
     )
   }
   if (lgAndUp.value) {
@@ -753,7 +753,7 @@ watch(
 }
 
 .list-content {
-  font-size: 1rem;
+  font-size: 14px;
   line-height: 1.4;
 }
 </style>

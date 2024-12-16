@@ -224,7 +224,7 @@
             </v-row>
           </v-card-text>
 
-          <v-card-actions class="px-4 mt-4">
+          <v-card-actions class="px-3 mt-4">
             <v-hover>
               <template #default="{ isHovering, props }">
                 <v-btn

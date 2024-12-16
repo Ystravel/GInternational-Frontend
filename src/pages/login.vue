@@ -299,19 +299,19 @@ onMounted(async () => {
 #background {
   width: 100%;
   height: 100%;
-  background-image: url(/src/assets/image/bg_login.webp);
+  background-image: url(/src/assets/image/bg_login.png);
   background-size: cover;
   background-position: center;
 }
 
 .login-wrapper {
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.7);
   backdrop-filter: blur(10px);
   border-radius: 20px;
   font-family: "微軟正黑體";
   font-size: 20px;
   font-weight: 600;
-  box-shadow: 0 0 20px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 0 20px 8px rgba(0,0,0,0.2);
 }
 
 .v-checkbox :deep(.v-label) {
