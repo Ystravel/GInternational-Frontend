@@ -184,7 +184,7 @@
                                 label="客戶名稱"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -198,7 +198,7 @@
                                 label="地址"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -212,7 +212,7 @@
                                 label="統編"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -226,7 +226,7 @@
                                 label="聯絡人"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -240,7 +240,7 @@
                                 label="部門"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -254,7 +254,7 @@
                                 label="電話"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -268,7 +268,7 @@
                                 label="郵件"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -282,7 +282,7 @@
                                 label="手機"
                                 variant="outlined"
                                 density="compact"
-                                class="mb-2"
+                                class="mb-1"
                                 clearable
                               />
                             </v-col>
@@ -312,7 +312,7 @@
                                     label="專案類別"
                                     variant="outlined"
                                     density="compact"
-                                    class="mb-2"
+                                    class="mb-1"
                                     clearable
                                   />
                                 </v-col>
@@ -326,7 +326,7 @@
                                     label="專案名稱"
                                     variant="outlined"
                                     density="compact"
-                                    class="mb-2"
+                                    class="mb-1"
                                     clearable
                                   />
                                 </v-col>
@@ -340,7 +340,7 @@
                                     label="工作天"
                                     variant="outlined"
                                     density="compact"
-                                    class="mb-2"
+                                    class="mb-1"
                                     clearable
                                   />
                                 </v-col>
@@ -354,7 +354,7 @@
                                     label="特殊備註 ( 報價項目下方呈現 )"
                                     variant="outlined"
                                     density="compact"
-                                    class="mb-2"
+                                    class="mb-1"
                                     clearable
                                   />
                                 </v-col>
@@ -373,7 +373,7 @@
                                     label="執行期天數"
                                     variant="outlined"
                                     density="compact"
-                                    class="mb-2"
+                                    class="mb-1"
                                     clearable
                                   />
                                 </v-col>
@@ -387,7 +387,7 @@
                                     label="延誤天數"
                                     variant="outlined"
                                     density="compact"
-                                    class="mb-2"
+                                    class="mb-1"
                                     clearable
                                   />
                                 </v-col>
@@ -448,7 +448,7 @@
                                             label="項目名稱"
                                             variant="outlined"
                                             density="compact"
-                                            class="mb-2"
+                                            class="mb-1"
                                             clearable
                                           />
                                         </v-col>
@@ -462,7 +462,7 @@
                                             label="說明"
                                             variant="outlined"
                                             density="compact"
-                                            class="mb-2"
+                                            class="mb-1"
                                             clearable
                                           />
                                         </v-col>
@@ -472,19 +472,20 @@
                                             <v-col
                                               cols="6"
                                               md="3"
+                                              class="pt-2"
                                             >
                                               <v-text-field
                                                 v-model="item.workDays"
                                                 label="工作天"
                                                 variant="outlined"
                                                 density="compact"
-                                                class="mb-2"
                                                 clearable
                                               />
                                             </v-col>
                                             <v-col
                                               cols="6"
                                               md="3"
+                                              class="pt-2"
                                             >
                                               <v-text-field
                                                 v-model.number="item.quantity"
@@ -498,6 +499,7 @@
                                             <v-col
                                               cols="6"
                                               md="3"
+                                              class="pt-2"
                                             >
                                               <v-text-field
                                                 v-model="item.unit"
@@ -510,6 +512,7 @@
                                             <v-col
                                               cols="6"
                                               md="3"
+                                              class="pt-2"
                                             >
                                               <v-text-field
                                                 v-model.number="item.price"
@@ -547,11 +550,11 @@
         class="ps-md-4"
       >
         <v-row
-          class="elevation-4 rounded-lg py-4 py-sm-4 px-1 px-sm-10 mt-2 mt-sm-6 mx-0 mx-sm-3 mb-4 bg-white"
-          style="min-width: 900px;"
+          class="elevation-4 rounded-lg pt-4 pb-3 px-1 px-sm-10 mt-2 mt-sm-6 mx-0 mx-sm-3 mb-4 bg-white"
+          style="min-width: 900px; min-height: 216px;"
         >
           <v-col cols="12">
-            <div class="card-title px-6 pt-6 text-grey-darken-2 d-flex justify-space-between">
+            <div class="card-title px-6 pt-6 text-grey-darken-3 d-flex justify-space-between">
               《 預覽及下載 》
               <v-btn
                 color="pink-darken-2"
@@ -1050,7 +1053,7 @@
               </tr>
               <tr v-if="!histories.length">
                 <td
-                  colspan="6"
+                  colspan="7"
                   class="text-center"
                 >
                   沒有資料

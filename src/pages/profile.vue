@@ -327,13 +327,13 @@
           取消
         </v-btn>
         <v-btn
-          color="red-darken-4"
+          color="teal-darken-1"
           variant="outlined"
           :size="buttonSize"
           :loading="isChangingPassword"
           @click="handlePasswordChange"
         >
-          確認修改
+          確認
         </v-btn>
       </v-card-actions>
     </v-card>

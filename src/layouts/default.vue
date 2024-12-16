@@ -438,12 +438,12 @@ const adminItems = [
     roles: ['ADMIN']
   },
   
-  // {
-  //   to: '/auditLog',
-  //   text: '異動紀錄',
-  //   icon: 'mdi-history',
-  //   roles: ['ADMIN']
-  // }
+  {
+    to: '/auditLog',
+    text: '異動紀錄',
+    icon: 'mdi-history',
+    roles: ['ADMIN']
+  }
 ]
 
 // 新增一個計算屬性來過濾可見的選單項目
