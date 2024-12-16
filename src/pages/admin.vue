@@ -436,8 +436,7 @@ const performSearch = async () => {
       tableItemsLength.value = data.result.totalItems
     }
   } catch (error) {
-    console.error('搜索失败:', error)
-    const errorMessage = error?.response?.data?.message || '搜索失败'
+    const errorMessage = error?.response?.data?.message || '搜索失敗'
     if (error?.response?.status === 401) {
       await user.logout()
       router.push('/login')
@@ -554,9 +553,13 @@ const hasChanges = computed(() => {
   if (!isEditing.value) return true
   if (!originalData.value) return false
 
-  return ['email', 'name', 'note', 'adminId'].some(
-    key => originalData.value[key] !== eval(`${key}.value.value`)
-  )
+  return ['email', 'name', 'note', 'adminId'].some(key => {
+    const formValue = key === 'email' ? email.value.value :
+                    key === 'name' ? name.value.value :
+                    key === 'note' ? note.value.value :
+                    key === 'adminId' ? adminId.value.value : null
+    return originalData.value[key] !== formValue
+  })
 })
 
 // ===== 監聽器 =====

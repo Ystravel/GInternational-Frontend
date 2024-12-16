@@ -618,9 +618,14 @@ const hasChanges = computed(() => {
   if (!isEditing.value) return true
   if (!originalData.value) return false
 
-  return ['email', 'name', 'role', 'note', 'userId'].some(
-    key => originalData.value[key] !== eval(`${key}.value.value`)
-  )
+  return ['email', 'name', 'role', 'note', 'userId'].some(key => {
+    const formValue = key === 'email' ? email.value.value :
+                    key === 'name' ? name.value.value :
+                    key === 'role' ? role.value.value :
+                    key === 'note' ? note.value.value :
+                    key === 'userId' ? userId.value.value : null
+    return originalData.value[key] !== formValue
+  })
 })
 
 // ===== 監聽器 =====
