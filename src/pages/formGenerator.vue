@@ -107,9 +107,9 @@
             </div>
           </v-col>
           <!-- 表單欄位區域 -->
-          <!-- 報價單表單 -->
+          <!-- 1. 銳皇專案報價單 -->
           <v-col
-            v-if="currentTemplate && selectedTemplate && currentTemplate === templateComponents.RayHuangQuotationTemplate"
+            v-if="currentTemplate && selectedTemplate && currentTemplate === templateComponents.RayHuangQuotationTemplate.preview"
             cols="12"
           >
             <v-row>
@@ -117,429 +117,32 @@
                 <!-- 報價單表單 -->
                 <v-card elevation="0">
                   <v-card-text>
-                    <v-form
-                      ref="form"
-                      v-model="valid"
-                    >
-                      <v-row>
-                        <!-- 基本資訊 -->
-                        <v-col
-                          cols="12"
-                          class="pa-0"
-                        >
-                          <v-row>
-                            <v-col cols="12">
-                              <div class="sub-title text-blue-grey-darken-2">
-                                基本資訊
-                              </div>
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.quotationNumber"
-                                label="單號"
-                                variant="outlined"
-                                density="compact"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-date-input
-                                v-model="formData.date"
-                                label="報價日期"
-                                variant="outlined"
-                                density="compact"
-                                prepend-icon
-                                clearable
-                              />
-                            </v-col>
-                          </v-row>
-                        </v-col>
-
-                        <!-- 客戶資訊 -->
-                        <v-col
-                          cols="12"
-                          class="pa-0 mt-4"
-                        >
-                          <v-row>
-                            <v-col cols="12">
-                              <div class="sub-title text-blue-grey-darken-2">
-                                客戶資訊
-                              </div>
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.customerName"
-                                label="客戶名稱"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.customerAddress"
-                                label="地址"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.customerTaxId"
-                                label="統編"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.customerContact"
-                                label="聯絡人"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.department"
-                                label="部門"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.customerPhone"
-                                label="電話"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.customerEmail"
-                                label="郵件"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                            <v-col
-                              cols="12"
-                              lg="6"
-                              class="pb-0"
-                            >
-                              <v-text-field
-                                v-model="formData.customerMobile"
-                                label="手機"
-                                variant="outlined"
-                                density="compact"
-                                class="mb-1"
-                                clearable
-                              />
-                            </v-col>
-                          </v-row>
-                        </v-col>
-
-                        <!-- 專案資訊 -->
-                        <v-col
-                          cols="12"
-                          class="pa-0 mt-4"
-                        >
-                          <v-row>
-                            <v-col cols="12">
-                              <v-row>
-                                <v-col cols="12">
-                                  <div class="sub-title text-blue-grey-darken-2">
-                                    專案資訊
-                                  </div>
-                                </v-col>
-                                <v-col
-                                  cols="12"
-                                  lg="6"
-                                  class="pb-0"
-                                >
-                                  <v-text-field
-                                    v-model="formData.projectType"
-                                    label="專案類別"
-                                    variant="outlined"
-                                    density="compact"
-                                    class="mb-1"
-                                    clearable
-                                  />
-                                </v-col>
-                                <v-col
-                                  cols="12"
-                                  lg="6"
-                                  class="pb-0"
-                                >
-                                  <v-text-field
-                                    v-model="formData.projectName"
-                                    label="專案名稱"
-                                    variant="outlined"
-                                    density="compact"
-                                    class="mb-1"
-                                    clearable
-                                  />
-                                </v-col>
-                                <v-col
-                                  cols="12"
-                                  lg="6"
-                                  class="pb-0"
-                                >
-                                  <v-text-field
-                                    v-model="formData.workDays"
-                                    label="工作天"
-                                    variant="outlined"
-                                    density="compact"
-                                    class="mb-1"
-                                    clearable
-                                  />
-                                </v-col>
-                                <v-col
-                                  cols="12"
-                                  lg="6"
-                                  class="pb-0"
-                                >
-                                  <v-text-field
-                                    v-model="formData.specialNote"
-                                    label="特殊備註 ( 報價項目下方呈現 )"
-                                    variant="outlined"
-                                    density="compact"
-                                    class="mb-1"
-                                    clearable
-                                  />
-                                </v-col>
-                                <v-col cols="12">
-                                  <div class="sub-title text-blue-grey-darken-2">
-                                    注意事項
-                                  </div>
-                                </v-col>
-                                <v-col
-                                  cols="12"
-                                  lg="6"
-                                  class="pb-0"
-                                >
-                                  <v-text-field
-                                    v-model="formData.validityDays"
-                                    label="執行期天數"
-                                    variant="outlined"
-                                    density="compact"
-                                    class="mb-1"
-                                    clearable
-                                  />
-                                </v-col>
-                                <v-col
-                                  cols="12"
-                                  lg="6"
-                                  class="pb-0"
-                                >
-                                  <v-text-field
-                                    v-model="formData.delayDays"
-                                    label="延誤天數"
-                                    variant="outlined"
-                                    density="compact"
-                                    class="mb-1"
-                                    clearable
-                                  />
-                                </v-col>
-                              </v-row>
-                            </v-col>
-
-                            <!-- 報價項目 -->
-                            <v-col cols="12">
-                              <v-row>
-                                <v-col cols="12">
-                                  <div class="sub-title text-blue-grey-darken-2 d-flex justify-space-between">
-                                    報價項目
-                                    <v-btn
-                                      color="blue-grey-darken-2"
-                                      variant="outlined"
-                                      prepend-icon="mdi-plus"
-                                      size="small"
-                                      @click="addItem"
-                                    >
-                                      新增項目
-                                    </v-btn>
-                                  </div>
-                                </v-col>
-                                <v-col cols="12">
-                                  <v-expand-transition group>
-                                    <div
-                                      v-for="(item, index) in formData.items"
-                                      :key="index"
-                                      class="mb-4 px-3 border rounded-lg"
-                                    >
-                                      <v-row>
-                                        <v-col
-                                          cols="12"
-                                          class="pb-0"
-                                        >
-                                          <div
-                                            class="d-flex justify-space-between align-center mt-2"
-                                            style="height: 40px;"
-                                          >
-                                            <span class="text-subtitle-2 text-grey-darken-1">項目 {{ index + 1 }}</span>
-                                            <v-btn
-                                              v-if="index > 0"
-                                              icon="mdi-close"
-                                              color="red-darken-1"
-                                              size="small"
-                                              variant="plain"
-                                              @click="removeItem(index)"
-                                            />
-                                          </div>
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          lg="6"
-                                          class="pb-0"
-                                        >
-                                          <v-text-field
-                                            v-model="item.name"
-                                            label="項目名稱"
-                                            variant="outlined"
-                                            density="compact"
-                                            class="mb-1"
-                                            clearable
-                                          />
-                                        </v-col>
-                                        <v-col
-                                          cols="12"
-                                          lg="6"
-                                          class="pb-0"
-                                        >
-                                          <v-text-field
-                                            v-model="item.description"
-                                            label="說明"
-                                            variant="outlined"
-                                            density="compact"
-                                            class="mb-1"
-                                            clearable
-                                          />
-                                        </v-col>
-
-                                        <v-col cols="12">
-                                          <v-row>
-                                            <v-col
-                                              cols="6"
-                                              md="3"
-                                              class="pt-2"
-                                            >
-                                              <v-text-field
-                                                v-model="item.workDays"
-                                                label="工作天"
-                                                variant="outlined"
-                                                density="compact"
-                                                clearable
-                                              />
-                                            </v-col>
-                                            <v-col
-                                              cols="6"
-                                              md="3"
-                                              class="pt-2"
-                                            >
-                                              <v-text-field
-                                                v-model.number="item.quantity"
-                                                label="數量"
-                                                type="number"
-                                                variant="outlined"
-                                                density="compact"
-                                                clearable
-                                              />
-                                            </v-col>
-                                            <v-col
-                                              cols="6"
-                                              md="3"
-                                              class="pt-2"
-                                            >
-                                              <v-text-field
-                                                v-model="item.unit"
-                                                label="單位"
-                                                variant="outlined"
-                                                density="compact"
-                                                clearable
-                                              />
-                                            </v-col>
-                                            <v-col
-                                              cols="6"
-                                              md="3"
-                                              class="pt-2"
-                                            >
-                                              <v-text-field
-                                                v-model.number="item.price"
-                                                label="單價"
-                                                type="number"
-                                                variant="outlined"
-                                                density="compact"
-                                                clearable
-                                              />
-                                            </v-col>
-                                          </v-row>
-                                        </v-col>
-                                      </v-row>
-                                    </div>
-                                  </v-expand-transition>
-                                </v-col>
-                              </v-row>
-                            </v-col>
-                          </v-row>
-                        </v-col>
-                      </v-row>
-                    </v-form>
+                    <RayHuangQuotationFormFields
+                      ref="formFieldsRef"
+                      v-model="formData"
+                    />
                   </v-card-text>
                 </v-card>
               </v-col>
-
-              <!-- 右側預覽區域 -->
+            </v-row>
+          </v-col>
+          <!-- 2. 永信旅遊報價單 -->
+          <v-col
+            v-if="currentTemplate && selectedTemplate && currentTemplate === templateComponents.YstravelQuotationTemplate.preview"
+            cols="12"
+          >
+            <v-row>
+              <v-col cols="12">
+                <!-- 報價單表單 -->
+                <v-card elevation="0">
+                  <v-card-text>
+                    <YstravelQuotationFormFields
+                      ref="formFieldsRef"
+                      v-model="formData"
+                    />
+                  </v-card-text>
+                </v-card>
+              </v-col>
             </v-row>
           </v-col>
         </v-row>
@@ -590,11 +193,7 @@
       </v-col>
     </v-row>
 
-    <!-- 頁面標題 -->
-
-    <!-- 主要內容區 -->
-
-    <!-- 單模板管理話框 -->
+    <!-- 表單模板管理話框 -->
     <v-dialog
       v-model="templateDialog.open"
       persistent
@@ -737,7 +336,7 @@
                     <v-text-field
                       v-model="templateForm.name"
                       :error-messages="templateErrors.name"
-                      label="表單報名*"
+                      label="表單名稱*"
                       variant="outlined"
                       density="compact"
                       clearable
@@ -842,7 +441,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- 刪除確認對話框 -->
+    <!-- 表單模板刪除確認對話框 -->
     <ConfirmDeleteDialogWithTextField
       v-model="deleteTemplateDialog.open"
       title="確認刪除表單模板"
@@ -967,11 +566,19 @@
               cols="12"
               sm="4"
               lg="3"
-              class="ms-auto mt-6"
+              class="ms-auto mt-6 ps-0 d-flex align-center"
             >
+              <v-icon
+                v-tooltip:start="'可搜尋單號、客戶名稱、專案名稱、項目'"
+                size="20"
+                color="blue-grey-darken-2"
+                class="me-2"
+              >
+                mdi-information
+              </v-icon>
               <v-text-field
                 v-model="historyQuickSearch"
-                label="搜尋單號 / 客戶名稱 / 專案名稱"
+                label="快速搜尋"
                 append-inner-icon="mdi-magnify"
                 variant="outlined"
                 density="compact"
@@ -1077,7 +684,7 @@
       </v-card>
     </v-dialog>
 
-    <!-- 確認刪除對話框 -->
+    <!-- 表單歷史紀錄確認刪除對話框 -->
     <ConfirmDeleteDialog
       v-model="confirmDeleteDialog.open"
       title="確認刪除表單"
@@ -1085,7 +692,7 @@
       @confirm="confirmDelete"
     />
 
-    <!-- 在 template 最後面加入這個確認對話框 -->
+    <!-- 表單歷史紀錄確認下載 PDF 檔對話框 -->
     <v-dialog
       v-model="confirmDownloadDialog.open"
       max-width="340"
@@ -1132,7 +739,12 @@ import UserRole from '@/enums/UserRole'
 import { definePage } from 'vue-router/auto'
 import { useUserStore } from '@/stores/user'
 import { useDisplay } from 'vuetify'
-import RayHuangQuotationTemplate from '@/components/templates/RayHuangQuotationTemplate.vue'
+import RayHuangQuotationTemplate from '@/components/templates/RayHuangQuotationTemplate/index.vue'
+import RayHuangQuotationFormFields from '@/components/templates/RayHuangQuotationTemplate/RayHuangQuotationFormFields.vue'
+import { quotationSchema as rayHuangQuotationSchema } from '@/components/templates/RayHuangQuotationTemplate/schema'
+import YstravelQuotationTemplate from '@/components/templates/YstravelQuotationTemplate/index.vue'
+import YstravelQuotationFormFields from '@/components/templates/YstravelQuotationTemplate/YstravelQuotationFormFields.vue'
+import { quotationSchema as ystravelQuotationSchema } from '@/components/templates/YstravelQuotationTemplate/schema'
 import ConfirmDeleteDialogWithTextField from '@/components/ConfirmDeleteDialogWithTextField.vue'
 import ConfirmDeleteDialog from '@/components/ConfirmDeleteDialog.vue'
 import { debounce } from 'lodash'
@@ -1156,8 +768,7 @@ const selectedTemplate = ref(null)
 const selectedType = ref(null)
 const templateOptions = ref([])
 const templateRef = ref(null)
-const form = ref(null)
-const valid = ref(false)
+const formFieldsRef = ref(null)
 const deletingFormId = ref('')
 
 // 模板相關
@@ -1166,9 +777,16 @@ const previewReady = ref(false)
 
 // 模板組映射
 const templateComponents = {
-  RayHuangQuotationTemplate
-  // 未來可以繼續添其他模板
-  // HiMaxQuotationTemplate: HiMaxQuotationTemplate
+  RayHuangQuotationTemplate: {
+    preview: RayHuangQuotationTemplate,
+    fields: RayHuangQuotationFormFields,
+    schema: rayHuangQuotationSchema
+  },
+  YstravelQuotationTemplate: {
+    preview: YstravelQuotationTemplate,
+    fields: YstravelQuotationFormFields,
+    schema: ystravelQuotationSchema
+  }
 }
 
 // 表單類型選項
@@ -1179,34 +797,86 @@ const templateTypeOptions = [
 ]
 
 // 表單資料
-const formData = ref({
-  quotationNumber: '',
-  date: new Date(),
-  customerName: '',
-  customerAddress: '',
-  customerTaxId: '',
-  customerContact: '',
-  department: '',
-  customerPhone: '',
-  customerEmail: '',
-  customerMobile: '',
-  projectType: '',
-  projectName: '',
-  workDays: '',
-  specialNote: '',
-  validityDays: '',
-  delayDays: '',
-  items: [
-    {
-      name: '',
-      description: '',
-      workDays: '',
-      quantity: 1,
-      unit: '份',
-      price: ''
-    }
-  ]
-})
+const formData = ref({})
+
+// 重置表單資料
+const resetFormData = (templateType) => {
+  switch (templateType) {
+    case 'RayHuangQuotationTemplate':
+      formData.value = {
+        quotationNumber: '',
+        date: new Date(),
+        customerName: '',
+        customerAddress: '',
+        customerTaxId: '',
+        customerContact: '',
+        department: '',
+        customerPhone: '',
+        customerEmail: '',
+        customerMobile: '',
+        projectType: '',
+        projectName: '',
+        workDays: '',
+        specialNote: '',
+        validityDays: '',
+        delayDays: '',
+        items: [
+          {
+            name: '',
+            description: '',
+            workDays: '',
+            quantity: 1,
+            unit: '份',
+            price: ''
+          }
+        ]
+      }
+      break
+    
+    case 'YstravelQuotationTemplate':
+      formData.value = {
+        quotationNumber: '',
+        date: new Date(),
+        
+        // 客戶資訊
+        customerName: '',
+        customerAddress: '',
+        customerTaxId: '',
+        contactPerson: '',
+        position: '',
+        officePhone: '',
+        fax: '',
+        mobile: '',
+        
+        // 旅遊資訊
+        projectName: '',
+        destination: '',
+        departureDate: new Date(),
+        returnDate: new Date(),
+        numberOfPeople: 1,
+        
+        // 報價明細
+        items: [
+          {
+            category: '',
+            description: '',
+            unitPrice: 0,
+            quantity: 1,
+            unit: '人',
+            remark: ''
+          }
+        ],
+        
+        // 備註
+        cancellationPolicy: '',
+        validityPeriod: 7
+      }
+      break
+    
+    default:
+      formData.value = {}
+  }
+}
 
 // 表單模板管理相關
 const templateDialog = ref({
@@ -1260,41 +930,72 @@ const filteredTemplates = computed(() => {
   })
 })
 
-// 方法
+// 修改 handleTemplateChange 方法
 const handleTemplateChange = async (templateId) => {
   if (!templateId) {
     currentTemplate.value = null
     previewReady.value = false
+    formData.value = {}
     return
   }
 
   try {
+    // 先設置 previewReady 為 false，避免在載入過程中顯示不完整的資料
+    previewReady.value = false
+    
     // 獲取模板資訊
     const { data } = await apiAuth.get(`/formTemplates/${templateId}`)
     if (data.success) {
       const template = data.result
       console.log('選擇的模板:', template)
-      const Component = templateComponents[template.componentName]
-      if (Component) {
-        currentTemplate.value = Component
-        previewReady.value = true
+      const components = templateComponents[template.componentName]
+      if (components) {
+        // 先設置新的 formData，再設置模板
+        formData.value = { ...components.schema }
+        currentTemplate.value = components.preview
 
         // 獲取下一個單號
         try {
-          const { data: numberData } = await apiAuth.get('/forms/next-number')
-          if (numberData.success) {
-            formData.value.quotationNumber = numberData.result
+          switch (template.componentName) {
+            case 'RayHuangQuotationTemplate': {
+              // 獲取銳皇報價單的下一個單號
+              const response = await apiAuth.get('/forms/ray-huang-quotation/next-number', {params: {templateId}})
+              if (response.data.success) {
+                formData.value.quotationNumber = response.data.result
+              }
+              break
+            }
+            case 'YstravelQuotationTemplate': {
+              // 獲取永信旅遊報價單的下一個單號
+              const response = await apiAuth.get('/forms/ystravel-quotation/next-number', {params: {templateId}})
+              if (response.data.success) {
+                formData.value.quotationNumber = response.data.result
+              }
+              break
+            }
+            // 可以在這裡添加其他模板的單號生成邏輯
+            default:
+              console.error('未知的模板類型:', template.componentName)
+              createSnackbar({
+                text: '無法生成單號：未知的模板類型',
+                snackbarProps: { color: 'red-lighten-1' }
+              })
           }
+          // 最後再設置 previewReady
+          previewReady.value = true
         } catch (error) {
           console.error('取得單號失敗:', error)
           createSnackbar({
             text: '取得單號失敗',
             snackbarProps: { color: 'red-lighten-1' }
           })
+          // 即使取得單號失敗，仍然顯示表單
+          previewReady.value = true
         }
       } else {
         console.error('找不到對應的組件:', template.componentName)
         currentTemplate.value = null
+        formData.value = {}
         previewReady.value = false
         createSnackbar({
           text: '找不到對應的組件',
@@ -1305,23 +1006,13 @@ const handleTemplateChange = async (templateId) => {
   } catch (error) {
     console.error('載入模板失敗:', error)
     currentTemplate.value = null
+    formData.value = {}
     previewReady.value = false
+    createSnackbar({
+      text: '載入模板失敗',
+      snackbarProps: { color: 'red-lighten-1' }
+    })
   }
-}
-
-const addItem = () => {
-  formData.value.items.push({
-    name: '',
-    description: '',
-    workDays: '',
-    quantity: 1,
-    unit: '份',
-    price: 0
-  })
-}
-
-const removeItem = (index) => {
-  formData.value.items.splice(index, 1)
 }
 
 // 添加新的狀態
@@ -1351,7 +1042,7 @@ const searchHistory = async () => {
     const params = {
       page: currentPage.value,
       itemsPerPage: itemsPerPage.value,
-      sort: 'formNumber',
+      sort: 'createdAt',
       order: 'desc'
     }
 
@@ -1395,8 +1086,8 @@ const debouncedHistorySearch = debounce(() => {
 }, 300)
 
 // 監聽快速搜尋的變化
-watch(historyQuickSearch, (newVal) => {
-  debouncedHistorySearch(newVal)
+watch(historyQuickSearch, () => {
+  debouncedHistorySearch()
 })
 
 // 修改重置搜尋方法，加入快速搜尋的重置
@@ -1412,18 +1103,35 @@ const resetHistorySearch = async () => {
   await searchHistory()
 }
 
-// 修改 downloadPDF 方法，加入 clientName
+// 修改 downloadPDF 方法
 const downloadPDF = async () => {
   if (isDownloading.value) return
-  isDownloading.value = true
 
+  // 直接在這裡進行表單驗證
+  const isValid = await formFieldsRef.value?.validate()
+  if (!isValid) {
+    createSnackbar({
+      text: '請填寫必填欄位',
+      snackbarProps: { color: 'red-lighten-1' }
+    })
+    return
+  }
+
+  isDownloading.value = true
   try {
     const element = templateRef.value?.$el
     if (!element) return
 
+    // 獲取當前選擇的表單模板名稱
+    const currentTemplate = formTemplates.value.find(t => t._id === selectedTemplate.value)
+    if (!currentTemplate) {
+      throw new Error('找不到表單模板')
+    }
+    const templateName = currentTemplate.name
+
     // 1. 生成 PDF
     console.log('開始生成 PDF')
-    const pdfBlob = await generatePDF(element)
+    const pdfBlob = await generatePDF(element, templateName)
     console.log('PDF 生成成功:', pdfBlob)
 
     // 2. 上傳 PDF
@@ -1433,13 +1141,96 @@ const downloadPDF = async () => {
 
     // 3. 儲存到資料庫
     try {
-      const { data } = await apiAuth.post('/forms', {
+      let formDataToSave = {
         formNumber: formData.value.quotationNumber,
-        clientName: formData.value.customerName,
-        projectName: formData.value.projectName,
         formTemplate: selectedTemplate.value,
-        pdfUrl: uploadData.result.url
-      })
+        pdfUrl: uploadData.result.url,
+        formData: {}
+      }
+
+      // 根據不同的表單類型，使用對應的資料結構
+      const template = formTemplates.value.find(t => t._id === selectedTemplate.value)
+      if (template) {
+        switch (template.componentName) {
+          case 'RayHuangQuotationTemplate':
+            formDataToSave.formData = {
+              // 基本資訊
+              date: formData.value.date,
+              // 客戶資訊
+              customerName: formData.value.customerName,
+              customerAddress: formData.value.customerAddress,
+              customerTaxId: formData.value.customerTaxId,
+              customerContact: formData.value.customerContact,
+              customerDepartment: formData.value.customerDepartment,
+              customerPhone: formData.value.customerPhone,
+              customerEmail: formData.value.customerEmail,
+              customerMobile: formData.value.customerMobile,
+              
+              // 專案資訊
+              projectType: formData.value.projectType,
+              projectName: formData.value.projectName,
+              workDays: formData.value.workDays,
+              specialNote: formData.value.specialNote,
+              validityDays: formData.value.validityDays,
+              delayDays: formData.value.delayDays,
+              
+              // 報價項目
+              items: formData.value.items.map(item => ({
+                name: item.name,
+                description: item.description,
+                workDays: item.workDays,
+                quantity: item.quantity,
+                unit: item.unit,
+                price: item.price
+              }))
+            }
+            break
+          
+          case 'YstravelQuotationTemplate':
+            formDataToSave.formData = {
+              // 基本資訊
+              date: formData.value.date,
+              
+              // 客戶資訊
+              customerName: formData.value.customerName,
+              customerAddress: formData.value.customerAddress,
+              customerTaxId: formData.value.customerTaxId,
+              contactPerson: formData.value.contactPerson,
+              position: formData.value.position,
+              officePhone: formData.value.officePhone,
+              fax: formData.value.fax,
+              mobile: formData.value.mobile,
+              
+              // 旅遊資訊
+              projectName: formData.value.projectName,
+              destination: formData.value.destination,
+              departureDate: formData.value.departureDate,
+              returnDate: formData.value.returnDate,
+              numberOfPeople: formData.value.numberOfPeople,
+              
+              // 報價明細
+              items: formData.value.items.map(item => ({
+                category: item.category,
+                description: item.description,
+                unitPrice: item.unitPrice,
+                quantity: item.quantity,
+                unit: item.unit,
+                remark: item.remark
+              })),
+              
+              // 備註
+              cancellationPolicy: formData.value.cancellationPolicy,
+              validityPeriod: formData.value.validityPeriod
+            }
+            break
+            
+          default:
+            console.error('未知的模板類型:', template.componentName)
+            throw new Error('未知的模板類型')
+        }
+      }
+
+      const { data } = await apiAuth.post('/forms', formDataToSave)
 
       if (data.success) {
         createSnackbar({
@@ -1452,7 +1243,7 @@ const downloadPDF = async () => {
         // 4. 下載 PDF
         const link = document.createElement('a')
         link.href = URL.createObjectURL(pdfBlob)
-        link.download = `報價單_${formData.value.quotationNumber}_${new Date().getTime()}.pdf`
+        link.download = `${templateName}_${formData.value.quotationNumber}.pdf`
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -1762,7 +1553,7 @@ const deleteTemplate = async () => {
     let errorMessage = '刪除失敗'
     // 處理特定的錯誤情況
     if (error.response?.status === 409) {
-      errorMessage = '此表單模板有表單使用中，無法刪除'
+      errorMessage = '此表單模板有表單使用中��無法刪除'
     } else {
       errorMessage = error.response?.data?.message || '刪除失敗'
     }
@@ -1803,44 +1594,35 @@ const loadDialogTemplates = async () => {
   }
 }
 
-// 監聽
+// 監聽選擇的模板變化
 watch(selectedTemplate, async (newVal) => {
-  // 清空預覽相關的狀態
+  if (newVal) {
+    const template = formTemplates.value.find(t => t._id === newVal)
+    if (template) {
+      resetFormData(template.componentName)
+      await handleTemplateChange(newVal)
+    }
+  } else {
+    resetFormData()
+    currentTemplate.value = null
+    previewReady.value = false
+  }
+})
+
+// 監聽表單類型變化
+watch(selectedType, (newVal) => {
+  // 當表單類型改變時，清空表單模板的選擇
+  selectedTemplate.value = null
   currentTemplate.value = null
   previewReady.value = false
-
+  formData.value = {}
+  
   if (newVal) {
-    await handleTemplateChange(newVal)
+    // 如果有選擇類型，載入對應的模板選項
+    loadFormTemplateOptions()
   } else {
-    // 重置表單資料
-    formData.value = {
-      quotationNumber: '',
-      date: new Date(),
-      customerName: '',
-      customerAddress: '',
-      customerTaxId: '',
-      customerContact: '',
-      department: '',
-      customerPhone: '',
-      customerEmail: '',
-      customerMobile: '',
-      projectType: '',
-      projectName: '',
-      workDays: '',
-      specialNote: '',
-      validityDays: '0',
-      delayDays: '0',
-      items: [
-        {
-          name: '',
-          description: '',
-          workDays: '',
-          quantity: 1,
-          unit: '份',
-          price: 0
-        }
-      ]
-    }
+    // 如果清空類型，則清空模板選項
+    templateOptions.value = []
   }
 })
 
@@ -1885,7 +1667,7 @@ onMounted(async () => {
 })
 
 // 添加 generatePDF 函數
-const generatePDF = async (element) => {
+const generatePDF = async (element, templateName) => {
   const style = document.createElement('style')
   style.textContent = `
     @page {
@@ -1897,7 +1679,7 @@ const generatePDF = async (element) => {
 
   const opt = {
     margin: 0,
-    filename: `報價單_${formData.value.quotationNumber}_${new Date().getTime()}.pdf`,
+    filename: `${templateName}_${formData.value.quotationNumber}.pdf`,
     image: { type: 'jpeg', quality: 1.0 },
     html2canvas: {
       scale: 6,
@@ -1921,7 +1703,7 @@ const generatePDF = async (element) => {
     const pdf = await html2pdf().set(opt).from(element).output('blob')
     return pdf
   } catch (error) {
-    console.error('PDF 成失敗:', error)
+    console.error('PDF 生成失敗:', error)
     throw error
   } finally {
     document.head.removeChild(style)
@@ -2075,7 +1857,7 @@ watch(selectedType, (newVal) => {
   selectedTemplate.value = null
   
   if (newVal) {
-    // 如果有選擇類型，則載入對應的模板選項
+    // 如果有選擇類型，載入對應的模板選項
     loadFormTemplateOptions()
   } else {
     // 如果清空類型，則清空模板選項
@@ -2146,24 +1928,6 @@ const confirmDownloadPDF = async () => {
 }
 </script>
 <style lang="scss" scoped>
-// .preview-content {
-//   background: white;
-//   width: 210mm;
-//   min-height: 297mm;
-//   margin: 0 auto;
-//   padding: 15mm;
-//   box-sizing: border-box;
-// }
-
-// .text-right {
-//   text-align: right;
-// }
-.v-select :deep(.v-field__input) {
-  .v-select__selection-text {
-    padding-bottom: 6px;
-  }
-}
-
 .v-table  {
   :deep(tbody tr:nth-child(odd)) {
     background-color: #f9ffff;
