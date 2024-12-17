@@ -1136,7 +1136,8 @@ const downloadPDF = async () => {
 
     // 2. 上傳 PDF
     const formDataForUpload = new FormData()
-    formDataForUpload.append('pdf', new File([pdfBlob], 'document.pdf', { type: 'application/pdf' }))
+    const pdfFileName = `${templateName}_${formData.value.quotationNumber}.pdf`
+    formDataForUpload.append('pdf', new File([pdfBlob], pdfFileName, { type: 'application/pdf' }))
     const { data: uploadData } = await apiAuth.post('/forms/upload/pdf', formDataForUpload)
 
     // 3. 儲存到資料庫
@@ -1553,7 +1554,7 @@ const deleteTemplate = async () => {
     let errorMessage = '刪除失敗'
     // 處理特定的錯誤情況
     if (error.response?.status === 409) {
-      errorMessage = '此表單模板有表單使用中��無法刪除'
+      errorMessage = '此表單模板有表單使用中，無法刪除'
     } else {
       errorMessage = error.response?.data?.message || '刪除失敗'
     }
