@@ -853,7 +853,6 @@ const resetFormData = (templateType) => {
         destination: '',
         departureDate: new Date(),
         returnDate: new Date(),
-        numberOfPeople: 1,
         
         // 報價明細
         items: [
@@ -1207,7 +1206,6 @@ const downloadPDF = async () => {
               destination: formData.value.destination,
               departureDate: formData.value.departureDate,
               returnDate: formData.value.returnDate,
-              numberOfPeople: formData.value.numberOfPeople,
               
               // 報價明細
               items: formData.value.items.map(item => ({

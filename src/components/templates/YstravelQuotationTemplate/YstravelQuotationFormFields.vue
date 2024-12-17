@@ -255,27 +255,14 @@
               @update:model-value="v => updateField('returnDate', v ? new Date(v) : null)"
             />
           </v-col>
-          <v-col
-            cols="12"
-            lg="6"
-            class="pb-0"
-          >
-            <v-text-field
-              :model-value="modelValue.numberOfPeople"
-              label="人數"
-              type="number"
-              variant="outlined"
-              density="compact"
-              class="mb-1"
-              clearable
-              @update:model-value="v => updateField('numberOfPeople', parseInt(v))"
-            />
-          </v-col>
         </v-row>
       </v-col>
 
       <!-- 報價明細 -->
-      <v-col cols="12">
+      <v-col
+        cols="12"
+        class="px-0"
+      >
         <v-row>
           <v-col cols="12">
             <div class="sub-title text-blue-grey-darken-2 d-flex justify-space-between">

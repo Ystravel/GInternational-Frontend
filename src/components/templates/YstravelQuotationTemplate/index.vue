@@ -140,17 +140,6 @@
                 {{ formatDate(formData.returnDate) }}
               </td>
             </tr>
-            <tr>
-              <td class="label">
-                人數
-              </td>
-              <td
-                class="content"
-                colspan="3"
-              >
-                {{ formData.numberOfPeople }} 人
-              </td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -337,14 +326,14 @@ const total = computed(() => {
   h2 {
     font-size: 24px;
     margin-bottom: 10px;
-    color: #1a237e;
+    color: #ff7f00;
   }
 }
 
 .company-info {
   text-align: right;
   img {
-    height: 60px;
+    height: 32px;
   }
   p {
     line-height: 1.5;
@@ -357,25 +346,24 @@ const total = computed(() => {
 
 .section-title {
   font-size: 18px;
-  color: #1a237e;
+  color: #ff7f00;
   margin-bottom: 10px;
   padding-bottom: 5px;
-  border-bottom: 2px solid #1a237e;
+  border-bottom: 2px solid #f29500;
 }
 
 .info-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 8px;
 
   td {
-    padding: 8px;
+    padding: 4px;
     border: 1px solid #ddd;
   }
 
   .label {
     width: 100px;
-    background-color: #f5f5f5;
+    background-color: #fff2e6;
     font-weight: bold;
   }
 }
@@ -383,7 +371,6 @@ const total = computed(() => {
 .items-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 15px;
 
   th, td {
     padding: 8px;
@@ -392,7 +379,7 @@ const total = computed(() => {
   }
 
   th {
-    background-color: #1a237e;
+    background-color: #f29500;
     color: white;
   }
 
@@ -404,17 +391,16 @@ const total = computed(() => {
     font-weight: bold;
     
     td {
-      border-top: 2px solid #1a237e;
+      border-top: 2px solid #f29500;
     }
   }
 }
 
 .notes {
   .note-item {
-    margin-bottom: 15px;
 
     h4 {
-      color: #1a237e;
+      color: #f29500;
       margin-bottom: 5px;
     }
 
@@ -433,20 +419,18 @@ const total = computed(() => {
 .signature {
   display: flex;
   justify-content: space-between;
-  margin-top: 30px;
   
   .stamp-box,
   .signature-box {
     width: 150px;
-    height: 80px;
-    border: 1px solid #ddd;
+    height: 64px;
     margin: 10px 0;
   }
 }
 
 .footer {
   text-align: center;
-  margin-top: 30px;
+  margin-top: 20px;
   color: #666;
 }
 

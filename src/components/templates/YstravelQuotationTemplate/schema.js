@@ -17,7 +17,6 @@ export const quotationSchema = {
   destination: '',
   departureDate: new Date(),
   returnDate: new Date(),
-  numberOfPeople: 1,
   
   // 報價明細
   items: [
