@@ -145,6 +145,36 @@
               </v-col>
             </v-row>
           </v-col>
+
+          <!-- 添加載入中的顯示 -->
+          <v-col
+            v-if="isTemplateLoading"
+            cols="12"
+          >
+            <v-row>
+              <v-col cols="12">
+                <v-card
+                  elevation="0"
+                >
+                  <v-card-text>
+                    <div
+                      class="d-flex flex-column align-center justify-center"
+                      style="min-height: 121px;"
+                    >
+                      <v-progress-circular
+                        indeterminate
+                        color="deep-purple-darken-2"
+                        size="32"
+                      />
+                      <div class="mt-4 text-grey font-weight-medium">
+                        載入表單欄位中...
+                      </div>
+                    </div>
+                  </v-card-text>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-col>
         </v-row>
       </v-col>
       <v-col
@@ -178,7 +208,24 @@
                 style="font-size: 15px; font-weight: 600;"
                 class="text-center text-grey font-weight-medium pa-0 pt-9 pb-3"
               >
-                ( 請 先 選 擇 表 單 模 版 )
+                <template v-if="isTemplateLoading">
+                  <div
+                    class="d-flex flex-column align-center justify-center"
+                    style="min-height: 200px;"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="deep-purple-darken-2"
+                      size="32"
+                    />
+                    <div class="mt-4">
+                      載入表單中...
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  ( 請 先 選 擇 表 單 模 版 )
+                </template>
               </v-card-text>
               <v-card-text v-if="previewReady">
                 <component
@@ -731,7 +778,7 @@
 </template>
 
 <script setup>
-import { ref, shallowRef, computed, watch, onMounted } from 'vue'
+import { ref, shallowRef, computed, watch, onMounted, nextTick } from 'vue'
 import { useSnackbar } from 'vuetify-use-dialog'
 import { useApi } from '@/composables/axios'
 import html2pdf from 'html2pdf.js'
@@ -774,6 +821,7 @@ const deletingFormId = ref('')
 // 模板相關
 const currentTemplate = shallowRef(null)
 const previewReady = ref(false)
+const isTemplateLoading = ref(false)
 
 // 模板組映射
 const templateComponents = {
@@ -939,8 +987,11 @@ const handleTemplateChange = async (templateId) => {
   }
 
   try {
+    // 開始載入，顯示載入動畫
+    isTemplateLoading.value = true
     // 先設置 previewReady 為 false，避免在載入過程中顯示不完整的資料
     previewReady.value = false
+    currentTemplate.value = null
     
     // 獲取模板資訊
     const { data } = await apiAuth.get(`/formTemplates/${templateId}`)
@@ -951,7 +1002,6 @@ const handleTemplateChange = async (templateId) => {
       if (components) {
         // 先設置新的 formData，再設置模板
         formData.value = { ...components.schema }
-        currentTemplate.value = components.preview
 
         // 獲取下一個單號
         try {
@@ -972,7 +1022,6 @@ const handleTemplateChange = async (templateId) => {
               }
               break
             }
-            // 可以在這裡添加其他模板的單號生成邏輯
             default:
               console.error('未知的模板類型:', template.componentName)
               createSnackbar({
@@ -980,7 +1029,11 @@ const handleTemplateChange = async (templateId) => {
                 snackbarProps: { color: 'red-lighten-1' }
               })
           }
-          // 最後再設置 previewReady
+          
+          // 所有資料都準備好後，再設置模板和 previewReady
+          currentTemplate.value = components.preview
+          // 使用 nextTick 確保 DOM 更新後再顯示
+          await nextTick()
           previewReady.value = true
         } catch (error) {
           console.error('取得單號失敗:', error)
@@ -989,6 +1042,8 @@ const handleTemplateChange = async (templateId) => {
             snackbarProps: { color: 'red-lighten-1' }
           })
           // 即使取得單號失敗，仍然顯示表單
+          currentTemplate.value = components.preview
+          await nextTick()
           previewReady.value = true
         }
       } else {
@@ -1011,6 +1066,9 @@ const handleTemplateChange = async (templateId) => {
       text: '載入模板失敗',
       snackbarProps: { color: 'red-lighten-1' }
     })
+  } finally {
+    // 結束載入，隱藏載入動畫
+    isTemplateLoading.value = false
   }
 }
 
