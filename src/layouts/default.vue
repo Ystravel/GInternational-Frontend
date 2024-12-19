@@ -139,6 +139,23 @@
             <v-list-item-title>{{ userItem.text }}</v-list-item-title>
           </v-list-item>
           <v-divider
+            color="grey-darken-3"
+            opacity="0.3"
+            class="my-2"
+          />
+          <v-list-item
+            v-for="cogItem in cogItems"
+            :key="cogItem.to"
+            :to="cogItem.to"
+            color="grey-darken-3"
+            class="mt-2"
+          >
+            <template #prepend>
+              <v-icon>{{ cogItem.icon }}</v-icon>
+            </template>
+            <v-list-item-title>{{ cogItem.text }}</v-list-item-title>
+          </v-list-item>
+          <v-divider
             v-if="user.isAdmin"
             color="grey-darken-3"
             opacity="0.3"
@@ -407,9 +424,24 @@ const userItems = [
   {
     to: '/formGenerator',
     text: '表單產生器',
-    icon: 'mdi-chart-box-outline',
+    icon: 'mdi-list-box-outline',
     roles: ['ADMIN', 'MANAGER']
   },
+  {
+    to: '/advertisingBudget',
+    text: '行銷廣告預算',
+    icon: 'mdi-advertisements',
+    roles: ['ADMIN', 'MANAGER']
+  }
+]
+
+const cogItems = [
+  {
+    to: '/advertisingBudgetManagement',
+    text: '行銷廣告預算管理',
+    icon: 'mdi-cookie-cog-outline',
+    roles: ['ADMIN', 'MANAGER']
+  }
 ]
 
 const adminItems = [

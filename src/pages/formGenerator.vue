@@ -120,6 +120,7 @@
                     <RayHuangQuotationFormFields
                       ref="formFieldsRef"
                       v-model="formData"
+                      :validate="enableValidation"
                     />
                   </v-card-text>
                 </v-card>
@@ -139,6 +140,7 @@
                     <YstravelQuotationFormFields
                       ref="formFieldsRef"
                       v-model="formData"
+                      :validate="enableValidation"
                     />
                   </v-card-text>
                 </v-card>
@@ -822,6 +824,7 @@ const deletingFormId = ref('')
 const currentTemplate = shallowRef(null)
 const previewReady = ref(false)
 const isTemplateLoading = ref(false)
+const enableValidation = ref(false)
 
 // 模板組映射
 const templateComponents = {
@@ -852,7 +855,7 @@ const resetFormData = (templateType) => {
   switch (templateType) {
     case 'RayHuangQuotationTemplate':
       formData.value = {
-        quotationNumber: '',
+        quotationNumber: '0',
         date: new Date(),
         customerName: '',
         customerAddress: '',
@@ -883,7 +886,7 @@ const resetFormData = (templateType) => {
     
     case 'YstravelQuotationTemplate':
       formData.value = {
-        quotationNumber: '',
+        quotationNumber: '0',
         date: new Date(),
         
         // 客戶資訊
@@ -992,6 +995,8 @@ const handleTemplateChange = async (templateId) => {
     // 先設置 previewReady 為 false，避免在載入過程中顯示不完整的資料
     previewReady.value = false
     currentTemplate.value = null
+    // 禁用表單驗證
+    enableValidation.value = false
     
     // 獲取模板資訊
     const { data } = await apiAuth.get(`/formTemplates/${templateId}`)
@@ -1035,6 +1040,8 @@ const handleTemplateChange = async (templateId) => {
           // 使用 nextTick 確保 DOM 更新後再顯示
           await nextTick()
           previewReady.value = true
+          // 啟用表單驗證
+          enableValidation.value = true
         } catch (error) {
           console.error('取得單號失敗:', error)
           createSnackbar({
@@ -1045,12 +1052,15 @@ const handleTemplateChange = async (templateId) => {
           currentTemplate.value = components.preview
           await nextTick()
           previewReady.value = true
+          // 啟用表單驗證
+          enableValidation.value = true
         }
       } else {
         console.error('找不到對應的組件:', template.componentName)
         currentTemplate.value = null
         formData.value = {}
         previewReady.value = false
+        enableValidation.value = false
         createSnackbar({
           text: '找不到對應的組件',
           snackbarProps: { color: 'red-lighten-1' }
@@ -1062,6 +1072,7 @@ const handleTemplateChange = async (templateId) => {
     currentTemplate.value = null
     formData.value = {}
     previewReady.value = false
+    enableValidation.value = false
     createSnackbar({
       text: '載入模板失敗',
       snackbarProps: { color: 'red-lighten-1' }
@@ -1164,7 +1175,11 @@ const resetHistorySearch = async () => {
 const downloadPDF = async () => {
   if (isDownloading.value) return
 
-  // 直接在這裡進行表單驗證
+  // 確保啟用驗證
+  enableValidation.value = true
+  await nextTick()
+
+  // 進行表單驗證
   const isValid = await formFieldsRef.value?.validate()
   if (!isValid) {
     createSnackbar({
