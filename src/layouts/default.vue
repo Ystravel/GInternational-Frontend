@@ -143,18 +143,54 @@
             opacity="0.3"
             class="my-2"
           />
-          <v-list-item
-            v-for="cogItem in cogItems"
-            :key="cogItem.to"
-            :to="cogItem.to"
-            color="grey-darken-3"
-            class="mt-2"
+          <template
+            v-for="cogItem in filteredCogItems"
+            :key="cogItem.text"
           >
-            <template #prepend>
-              <v-icon>{{ cogItem.icon }}</v-icon>
-            </template>
-            <v-list-item-title>{{ cogItem.text }}</v-list-item-title>
-          </v-list-item>
+            <!-- 有子選單的項目 -->
+            <v-list-group
+              v-if="cogItem.children"
+              :value="openedGroups.includes(cogItem.text)"
+              @click="toggleGroup(cogItem.text)"
+            >
+              <template #activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  color="grey-darken-3"
+                >
+                  <template #prepend>
+                    <v-icon>{{ cogItem.icon }}</v-icon>
+                  </template>
+                  <v-list-item-title>{{ cogItem.text }}</v-list-item-title>
+                </v-list-item>
+              </template>
+
+              <v-list-item
+                v-for="child in cogItem.children"
+                :key="child.to"
+                :to="child.to"
+                color="grey-darken-3"
+              >
+                <template #prepend>
+                  <v-icon>{{ child.icon }}</v-icon>
+                </template>
+                <v-list-item-title>{{ child.text }}</v-list-item-title>
+              </v-list-item>
+            </v-list-group>
+
+            <!-- 沒有子選單的項目 -->
+            <v-list-item
+              v-else
+              :to="cogItem.to"
+              color="grey-darken-3"
+              class="mt-2"
+            >
+              <template #prepend>
+                <v-icon>{{ cogItem.icon }}</v-icon>
+              </template>
+              <v-list-item-title>{{ cogItem.text }}</v-list-item-title>
+            </v-list-item>
+          </template>
           <v-divider
             v-if="user.isAdmin"
             color="grey-darken-3"
@@ -429,35 +465,41 @@ const userItems = [
   },
   {
     to: '/advertisingBudget',
-    text: '行銷廣告預算',
-    icon: 'mdi-advertisements',
+    text: '行銷費用分析',
+    icon: 'mdi-chart-multiple',
     roles: ['ADMIN', 'MANAGER']
   }
 ]
 
 const cogItems = [
   {
-    to: '/advertisingBudgetManagement',
-    text: '行銷廣告預算管理',
-    icon: 'mdi-cookie-cog-outline',
-    roles: ['ADMIN', 'MANAGER']
-  }
+    text: '行銷費用管理',
+    icon: 'mdi-chart-bar',
+    roles: ['ADMIN', 'MANAGER', 'USER'],
+    children: [
+      {
+        to: '/marketingExpenseManagement',
+        text: '實際花費管理',
+        icon: 'mdi-cash-100',
+        roles: ['ADMIN', 'MANAGER']
+      },
+      {
+        to: '/advertisingBudgetManagement',
+        text: '行銷預算管理',
+        icon: 'mdi-table-edit',
+        roles: ['ADMIN', 'MANAGER']
+      },
+      {
+        to: '/advertisingCategoryManagement',
+        text: '行銷分類管理',
+        icon: 'mdi-shape-plus-outline',
+        roles: ['ADMIN', 'MANAGER']
+      }
+    ]
+  },
 ]
 
 const adminItems = [
-  // {
-  //   text: '人事管理',
-  //   icon: 'mdi-account-group',
-  //   roles: ['ADMIN',],
-  //   children: [
-  //     {
-  //       to: '/user',
-  //       text: '員工管理',
-  //       icon: 'mdi-account-cog',
-  //       roles: ['ADMIN']
-  //     }
-  //   ]
-  // },
   {
     to: '/admin',
     text: '管理者管理',
@@ -478,6 +520,41 @@ const adminItems = [
     roles: ['ADMIN']
   }
 ]
+const filteredCogItems = computed(() => {
+  return cogItems.filter(item => {
+    const hasPermission = item.roles.some(role => {
+      switch (role) {
+        case 'ADMIN':
+          return user.isAdmin
+        case 'MANAGER':
+          return user.isManager
+        default:
+          return false
+      }
+    })
+
+    // 如果有子項目，也需要檢查子項目的權限
+    if (item.children) {
+      item.children = item.children.filter(child => {
+        return child.roles.some(role => {
+          switch (role) {
+            case 'ADMIN':
+              return user.isAdmin
+            case 'MANAGER':
+              return user.isManager
+            default:
+              return false
+          }
+        })
+      })
+      // 只有當子項目不為空時才顯示父項目
+      return hasPermission && item.children.length > 0
+    }
+
+    return hasPermission
+  })
+})
+
 
 // 新增一個計算屬性來過濾可見的選單項目
 const filteredAdminItems = computed(() => {
