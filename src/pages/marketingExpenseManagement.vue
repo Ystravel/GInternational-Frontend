@@ -1,88 +1,219 @@
 <template>
-  <v-container max-width="2000">
-    <v-row class="elevation-4 rounded-lg py-4 py-sm-8 px-1 px-sm-10 mt-2 mt-sm-6 mx-0 mx-sm-4 mx-md-4 mb-4 bg-white">
-      <!-- 標題區塊 -->
-      <v-col
+  <v-container max-width="2200">
+    <v-row class="pt-md-5">
+      <v-col 
         cols="12"
-        class="ps-3 pb-6 d-flex align-center"
+        lg="4"
+        xl="3"
       >
-        <h3 class="d-inline">
-          實際花費管理
-        </h3>
-        <div
-          style="width: 260px;"
-          class="ms-auto d-flex align-center"
-        >
-          <v-icon
-            v-tooltip:start="'可搜尋備註'"
-            icon="mdi-information"
-            size="small"
-            color="deep-purple-darken-4"
-            class="me-2"
-          />
-          <v-text-field
-            v-model="searchText"
-            label="搜尋"
-            append-inner-icon="mdi-magnify"
-            :loading="isSearching"
-            base-color="#666"
-            color="blue-grey-darken-3"
-            variant="outlined"
-            density="compact"
-            hide-details
-            clearable
-            @update:model-value="handleSearch"
-          />
-        </div>
-      </v-col>
-
-      <!-- 表格區塊 -->
-      <v-col cols="12">
-        <div class="d-flex align-center mb-4">
-          <v-btn
-            color="teal-darken-1"
-            variant="outlined"
-            prepend-icon="mdi-plus"
-            @click="openDialog()"
+        <v-row>
+          <v-col
+            cols="12"
+            class="mt-1 px-lg-10"
           >
-            新增實際花費
-          </v-btn>
-        </div>
+            <v-card class="elevation-4 rounded-lg py-4 py-sm-8 px-4 px-sm-4 px-xl-8">
+              <v-card-title class="font-weight-bold d-flex align-center">
+                搜尋條件
+              </v-card-title>
+              <v-card-text class="pa-2">
+                <v-row>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    lg="12"
+                  >
+                    <v-autocomplete
+                      v-model="searchCriteria.theme"
+                      :items="themeOptions"
+                      label="行銷主題"
+                      item-title="name"
+                      item-value="_id"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      clearable
+                      class="mb-6"
+                    />
+                    <v-autocomplete
+                      v-model="searchCriteria.channel"
+                      :items="channelOptions"
+                      label="廣告渠道"
+                      item-title="name"
+                      item-value="_id"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      clearable
+                      class="mb-6"
+                    />
+                    <v-autocomplete
+                      v-model="searchCriteria.platform"
+                      :items="platformOptions"
+                      label="平台"
+                      item-title="name"
+                      item-value="_id"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      clearable
+                      class="mb-6"
+                    />
+                    <v-autocomplete
+                      v-model="searchCriteria.detail"
+                      :items="detailOptions"
+                      label="細項"
+                      item-title="name"
+                      item-value="_id"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      clearable
+                      class="mb-6"
+                    />
+                    <v-autocomplete
+                      v-model="searchCriteria.relatedBudget"
+                      :items="budgetOptions"
+                      label="關聯預算表"
+                      item-title="name"
+                      item-value="_id"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      clearable
+                      class="mb-6"
+                    />
+                    <v-date-input
+                      v-model="searchCriteria.dateRange"
+                      label="日期區間"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      multiple="range"
+                      prepend-icon
+                      clearable
+                      class="mb-6"
+                      :cancel-text="'取消'"
+                      :ok-text="'確認'"
+                    />
+                    <v-row class="d-flex justify-space-between">
+                      <v-col cols="3">
+                        <v-btn
+                          color="grey"
+                          width="40"
+                          block
+                          @click="resetSearch"
+                        >
+                          <v-icon>mdi-refresh</v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col
+                        cols="9"
+                        class="ps-0"
+                      >
+                        <v-btn
+                          color="cyan-darken-2"
+                          prepend-icon="mdi-magnify"
+                          :loading="isLoading"
+                          block
+                          @click="performSearch"
+                        >
+                          搜尋
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col>
+        <v-row class="elevation-4 rounded-lg py-4 py-sm-8 px-1 px-sm-10 mt-1 mx-0 mx-sm-4 ms-md-0 me-md-4 mb-4 bg-white">
+          <!-- 標題區塊 -->
+          <v-col
+            cols="12"
+            class="ps-3 pb-6 d-flex align-center"
+          >
+            <h3 class="d-inline">
+              實際花費管理
+            </h3>
+          </v-col>
 
-        <v-data-table-server
-          v-model:items-per-page="itemsPerPage"
-          v-model:page="page"
-          :headers="headers"
-          :items="items"
-          :items-length="totalItems"
-          :loading="isLoading"
-          class="elevation-0 rounded-lg"
-        >
-          <template #item-invoiceDate="{ item }">
-            {{ formatDate(item.invoiceDate) }}
-          </template>
-
-          <template #item-expense="{ item }">
-            {{ formatNumber(item.expense) }}
-          </template>
-
-          <template #item-actions="{ item }">
-            <v-btn
-              v-tooltip="{ text: '編輯', location: 'start' }"
-              icon
-              color="light-blue-darken-4"
-              variant="plain"
-              size="small"
-              @click="editItem(item)"
+          <!-- 表格區塊 -->
+          <v-col cols="12">
+            <div class="d-flex align-center mb-4">
+              <v-btn
+                color="purple-darken-4"
+                variant="outlined"
+                prepend-icon="mdi-plus"
+                @click="openDialog()"
+              >
+                新增實際花費
+              </v-btn>
+              <div
+                style="width: 260px;"
+                class="ms-auto d-flex align-center"
+              >
+                <v-icon
+                  v-tooltip:start="'可搜尋花費金額、備註、建立者'"
+                  icon="mdi-information"
+                  size="small"
+                  color="deep-purple-darken-4"
+                  class="me-2"
+                />
+                <v-text-field
+                  v-model="searchText"
+                  label="快速搜尋"
+                  append-inner-icon="mdi-magnify"
+                  :loading="isSearching"
+                  base-color="#666"
+                  color="blue-grey-darken-3"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  clearable
+                  @update:model-value="handleSearch"
+                />
+              </div>
+            </div>
+          </v-col>
+          <v-col cols="12">
+            <v-data-table-server
+              v-model:items-per-page="itemsPerPage"
+              v-model:page="page"
+              :headers="headers"
+              :items="items"
+              :items-length="totalItems"
+              :loading="isLoading"
+              class="elevation-0 rounded-lg"
             >
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </template>
-        </v-data-table-server>
+              <template #[`item.invoiceDate`]="{ item }">
+                {{ formatDate(item.invoiceDate) }}
+              </template>
+
+              <template #[`item.expense`]="{ item }">
+                {{ formatNumber(item.expense) }}
+              </template>
+
+              <template #[`item.actions`]="{ item }">
+                <v-btn
+                  icon
+                  color="light-blue-darken-4"
+                  variant="plain"
+                  :size="buttonSize"
+                  @click="editItem(item)"
+                >
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+              </template>
+            </v-data-table-server>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
 
-    <!-- 新���/編輯對話框 -->
+    <!-- 新增/編輯對話框 -->
     <v-dialog
       v-model="dialog.open"
       persistent
@@ -99,16 +230,18 @@
             {{ dialog.id ? '編輯實際花費' : '新增實際花費' }}
           </div>
 
-          <v-card-text class="mt-3 pa-3">
+          <v-card-text class="mt-2 pa-3">
             <v-row>
               <v-col cols="12">
-                <v-text-field
+                <v-date-input
                   v-model="invoiceDate.value.value"
                   :error-messages="invoiceDate.errorMessage.value"
                   label="*日期"
-                  type="date"
+                  prepend-icon
                   variant="outlined"
                   density="compact"
+                  ok-text="確認"
+                  cancel-text="取消"
                 />
               </v-col>
 
@@ -161,7 +294,7 @@
                   :items="detailOptions"
                   item-title="name"
                   item-value="_id"
-                  label="*���項"
+                  label="*細項"
                   variant="outlined"
                   density="compact"
                   clearable
@@ -276,7 +409,18 @@ import ConfirmDeleteDialogWithTextField from '@/components/ConfirmDeleteDialogWi
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 import { debounce } from 'lodash'
-import { formatDate, formatNumber } from '@/utils/format'
+import { formatNumber } from '@/utils/format'
+
+// 自定義日期格式化函數
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+  const year = localDate.getFullYear()
+  const month = String(localDate.getMonth() + 1).padStart(2, '0')
+  const day = String(localDate.getDate()).padStart(2, '0')
+  return `${year}/${month}/${day}`
+}
 
 // ===== 頁面設定 =====
 definePage({
@@ -296,7 +440,7 @@ const router = useRouter()
 // ===== 響應式設定與螢幕斷點 =====
 const { smAndUp } = useDisplay()
 const buttonSize = computed(() => smAndUp.value ? 'default' : 'small')
-const dialogWidth = computed(() => smAndUp.value ? '500' : '100%')
+const dialogWidth = computed(() => smAndUp.value ? '440' : '100%')
 
 // ===== 基礎狀態管理 =====
 const confirmDeleteDialog = ref(false)
@@ -345,8 +489,9 @@ const headers = [
   { title: '廣告渠道', key: 'channel.name', align: 'start', sortable: false },
   { title: '平台', key: 'platform.name', align: 'start', sortable: false },
   { title: '細項', key: 'detail.name', align: 'start', sortable: false },
-  { title: '花費金額', key: 'expense', align: 'end', sortable: false },
+  { title: '花費金額', key: 'expense', align: 'start', sortable: false },
   { title: '備註', key: 'note', align: 'start', sortable: false },
+  { title: '建立者', key: 'creator.name', align: 'start', sortable: false },
   { title: '操作', key: 'actions', align: 'center', sortable: false }
 ]
 
@@ -363,10 +508,41 @@ const detailOptions = ref([])
 const budgetOptions = ref([])
 
 // ===== 搜尋相關設定 =====
+const searchCriteria = ref({
+  theme: null,
+  channel: null,
+  platform: null,
+  detail: null,
+  relatedBudget: null,
+  dateRange: []
+})
+
 const searchText = ref('')
+
 const debouncedSearch = debounce(() => {
+  page.value = 1
   loadData()
 }, 300)
+
+// 重置搜尋
+const resetSearch = () => {
+  searchCriteria.value = {
+    theme: null,
+    channel: null,
+    platform: null,
+    detail: null,
+    relatedBudget: null,
+    dateRange: []
+  }
+  searchText.value = ''
+  performSearch()
+}
+
+// 執行搜尋
+const performSearch = async () => {
+  page.value = 1
+  await loadData()
+}
 
 // ===== 計算屬性 =====
 const hasChanges = computed(() => {
@@ -403,6 +579,26 @@ watch([page, itemsPerPage], () => {
   loadData()
 })
 
+// 添加日期驗證監聽
+watch(
+  [
+    () => searchCriteria.value.dateRange
+  ],
+  ([newDateRange]) => {
+    if (newDateRange && newDateRange.length > 0) {
+      const start = new Date(newDateRange[0])
+      const end = new Date(newDateRange[newDateRange.length - 1])
+      if (start > end) {
+        createSnackbar({
+          text: '結束日期不能早於開始日期',
+          snackbarProps: { color: 'warning' }
+        })
+        searchCriteria.value.dateRange = []
+      }
+    }
+  }
+)
+
 // ===== 方法 =====
 const loadData = async () => {
   try {
@@ -412,13 +608,52 @@ const loadData = async () => {
       itemsPerPage: itemsPerPage.value
     }
 
+    // 處理快速搜尋
     if (searchText.value) {
       params.search = searchText.value
     }
 
+    // 處理條件搜尋
+    if (searchCriteria.value.theme) {
+      params.theme = searchCriteria.value.theme
+    }
+    if (searchCriteria.value.channel) {
+      params.channel = searchCriteria.value.channel
+    }
+    if (searchCriteria.value.platform) {
+      params.platform = searchCriteria.value.platform
+    }
+    if (searchCriteria.value.detail) {
+      params.detail = searchCriteria.value.detail
+    }
+    if (searchCriteria.value.relatedBudget) {
+      params.relatedBudget = searchCriteria.value.relatedBudget
+    }
+
+    // 處理日期範圍
+    if (searchCriteria.value.dateRange?.length > 0) {
+      const startDate = new Date(searchCriteria.value.dateRange[0])
+      startDate.setHours(0, 0, 0, 0)
+      const endDate = searchCriteria.value.dateRange.length > 1 
+        ? new Date(searchCriteria.value.dateRange[searchCriteria.value.dateRange.length - 1])
+        : new Date(searchCriteria.value.dateRange[0])
+      endDate.setHours(23, 59, 59, 999)
+      
+      params.startDate = startDate.toISOString()
+      params.endDate = endDate.toISOString()
+    }
+
     const { data } = await apiAuth.get('/marketing/expenses/all', { params })
     if (data.success) {
-      items.value = data.result.data
+      items.value = data.result.data.map(item => ({
+        ...item,
+        theme: { ...item.theme },
+        channel: { ...item.channel },
+        platform: { ...item.platform },
+        detail: { ...item.detail },
+        creator: { ...item.creator },
+        relatedBudget: item.relatedBudget ? { ...item.relatedBudget } : null
+      }))
       totalItems.value = data.result.totalItems
     }
   } catch (error) {
@@ -455,6 +690,24 @@ const loadOptions = async () => {
     if (detailData.success) {
       detailOptions.value = detailData.result
     }
+
+    // 載入預算表選項
+    try {
+      const { data: budgetData } = await apiAuth.get('/marketing/budgets/all', {
+        params: {
+          page: 1,
+          itemsPerPage: 9999 // 獲取所有預算表
+        }
+      })
+      if (budgetData.success) {
+        budgetOptions.value = budgetData.result.data.map(budget => ({
+          _id: budget._id,
+          name: `${budget.year}年度 - ${budget.theme.name}`
+        }))
+      }
+    } catch (error) {
+      console.error('載入預算表選項失敗:', error)
+    }
   } catch (error) {
     handleError(error)
   }
@@ -476,7 +729,12 @@ const editItem = (item) => {
       return
     }
     
-    invoiceDate.value.value = item.invoiceDate
+    // 處理日期，轉換為本地日期字符串 YYYY-MM-DD 格式
+    const date = new Date(item.invoiceDate)
+    const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000))
+    const formattedDate = localDate.toISOString().split('T')[0]
+    
+    invoiceDate.value.value = formattedDate
     theme.value.value = item.theme._id
     channel.value.value = item.channel._id
     platform.value.value = item.platform._id
@@ -491,7 +749,7 @@ const editItem = (item) => {
       id: item._id
     }
   } catch (error) {
-    console.error('編輯項目時發生錯誤:', error)
+    console.error('編輯項目發生錯誤:', error)
     handleError(error)
   }
 }
@@ -514,8 +772,12 @@ const submit = handleSubmit(async (values) => {
   
   try {
     isSubmitting.value = true
+    const date = new Date(values.invoiceDate)
+    date.setHours(0, 0, 0, 0)
+    
     const submitData = {
-      invoiceDate: values.invoiceDate,
+      invoiceDate: date.toISOString(),
+      year: date.getFullYear(),
       theme: values.theme,
       channel: values.channel,
       platform: values.platform,
@@ -599,14 +861,11 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-.card-title {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #333;
-  border-bottom: 1px solid #e0e0e0;
-}
-
 :deep(.v-data-table) {
+  thead {
+    background: #5c0199;
+    color: #fff;
+  }
   .v-data-table__tr {
     &:nth-child(odd) {
       background: #f8fcff;

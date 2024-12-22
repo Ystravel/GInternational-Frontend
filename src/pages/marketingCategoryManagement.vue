@@ -497,6 +497,13 @@ const debouncedSearch = debounce(() => {
 // 監聽搜尋文字變化
 watch(quickSearchText, () => {
   isLoading.value = true
+  // 重置所有分頁到第一頁
+  pages.value = {
+    0: 1,
+    1: 1,
+    2: 1,
+    3: 1
+  }
   debouncedSearch()
 })
 
@@ -699,7 +706,7 @@ onMounted(async () => {
 const pages = ref({
   0: 1, // 行銷主題的當前頁碼
   1: 1, // 廣告渠道的當前頁碼
-  2: 1, // 平台的當前頁碼
+  2: 1, // 平台的���前頁碼
   3: 1  // 細項的當前頁碼
 })
 

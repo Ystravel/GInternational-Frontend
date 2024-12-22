@@ -484,13 +484,13 @@ const cogItems = [
         roles: ['ADMIN', 'MANAGER']
       },
       {
-        to: '/advertisingBudgetManagement',
+        to: '/marketingBudgetManagement',
         text: '行銷預算管理',
         icon: 'mdi-table-edit',
         roles: ['ADMIN', 'MANAGER']
       },
       {
-        to: '/advertisingCategoryManagement',
+        to: '/marketingCategoryManagement',
         text: '行銷分類管理',
         icon: 'mdi-shape-plus-outline',
         roles: ['ADMIN', 'MANAGER']

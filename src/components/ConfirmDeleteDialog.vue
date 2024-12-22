@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <v-dialog
     v-model="isOpen"
@@ -9,7 +10,7 @@
         {{ title }}
       </v-card-title>
       <v-card-text class="ms-1">
-        {{ message }}
+        <div v-html="message" />
       </v-card-text>
       <v-card-actions class="me-4 mb-2">
         <v-spacer />
@@ -91,6 +92,19 @@ const confirm = () => {
 }
 </script>
 
-<style scoped>
-/* 根據需要定義樣式 */
+<style lang="scss" scoped>
+:deep(.v-card-text) {
+  .text-red {
+    color: #ef5350 !important;
+  }
+  .text-pink-lighten-1 {
+    color: #ec407a !important;
+  }
+  .text-orange-darken-2 {
+    color: #f57c00 !important;
+  }
+  .text-pink-darken-1 {
+    color: #d81b60 !important;
+  }
+}
 </style>
