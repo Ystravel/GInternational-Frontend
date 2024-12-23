@@ -1,5 +1,5 @@
 <template>
   <v-container>
-    <h1>廣告預算管理</h1>
+    <h1>行銷費用分析</h1>
   </v-container>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="2000">
+  <v-container max-width="2160">
     <v-row class="pt-md-5">
       <v-col 
         cols="12"
@@ -80,11 +80,13 @@
       <v-col>
         <v-row class="elevation-4 rounded-lg py-4 py-sm-8 px-1 px-sm-10 mt-1 mx-0 mx-sm-4 ms-md-0 me-md-4 mb-4 bg-white">
           <!-- 標題區塊 -->
-          <v-col
+          <v-col 
             cols="12"
             class="ps-3 pb-6 d-flex align-center"
           >
-            <h3 class="d-inline">
+            <h3
+              class="d-inline"
+            >
               行銷預算管理
             </h3>
           </v-col>
@@ -100,12 +102,38 @@
               >
                 新增預算表
               </v-btn>
+              <div
+                style="width: 260px;"
+                class="ms-auto d-flex align-center"
+              >
+                <v-icon
+                  v-tooltip:start="'可搜尋備註、建立者'"
+                  icon="mdi-information"
+                  size="small"
+                  color="deep-purple-darken-4"
+                  class="me-2"
+                />
+                <v-text-field
+                  v-model="quickSearchText"
+                  label="搜尋"
+                  append-inner-icon="mdi-magnify"
+                  :loading="isLoading"
+                  base-color="#666"
+                  color="blue-grey-darken-3"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  clearable
+                  @update:model-value="handleQuickSearch"
+                />
+              </div>
             </div>
           </v-col>
           <v-col cols="12">
             <v-data-table-server
               v-model:items-per-page="itemsPerPage"
               v-model:page="page"
+              density="compact"
               :headers="headers"
               :items="items"
               :items-length="totalItems"
@@ -241,6 +269,8 @@
                       <th class="platform-col">
                         平台
                       </th>
+                      <th class="sort-buttons-col" />
+                      <th class="quick-fill-col" />
                       <th
                         v-for="(month, key) in monthList"
                         :key="key"
@@ -298,6 +328,29 @@
                                   hide-details
                                   class="channel-select"
                                 />
+                                <!-- 渠道排序按鈕 -->
+                                <div class="sort-buttons-wrapper">
+                                  <div class="d-flex flex-column align-center">
+                                    <v-btn
+                                      v-tooltip="'上移'"
+                                      icon="mdi-chevron-up"
+                                      size="24"
+                                      density="compact"
+                                      variant="text"
+                                      :disabled="channelIndex === 0"
+                                      @click="moveChannel(channelIndex, 'up')"
+                                    />
+                                    <v-btn
+                                      v-tooltip="'下移'"
+                                      icon="mdi-chevron-down"
+                                      size="24"
+                                      density="compact"
+                                      variant="text"
+                                      :disabled="channelIndex === budgetData.length - 1"
+                                      @click="moveChannel(channelIndex, 'down')"
+                                    />
+                                  </div>
+                                </div>
                                 <!-- 新增平台按鈕 -->
                                 <v-btn
                                   v-tooltip="'新增平台'"
@@ -342,6 +395,44 @@
                               hide-details
                               class="platform-select"
                             />
+                          </td>
+                          <!-- 平台排序按鈕 -->
+                          <td class="sort-buttons-col">
+                            <div class="d-flex flex-column align-center">
+                              <v-btn
+                                v-tooltip="'上移'"
+                                icon="mdi-chevron-up"
+                                size="24"
+                                density="compact"
+                                variant="text"
+                                :disabled="platformIndex === 0"
+                                @click="movePlatform(channelIndex, platformIndex, 'up')"
+                              />
+                              <v-btn
+                                v-tooltip="'下移'"
+                                icon="mdi-chevron-down"
+                                size="24"
+                                density="compact"
+                                variant="text"
+                                :disabled="platformIndex === channel.platforms.length - 1"
+                                @click="movePlatform(channelIndex, platformIndex, 'down')"
+                              />
+                            </div>
+                          </td>
+
+                          <!-- 快速填入按鈕 -->
+                          <td class="quick-fill-col">
+                            <v-btn
+                              v-tooltip="'快速填入所有月份金額'"
+                              icon
+                              size="24"
+                              color="teal-darken-2"
+                              @click="showQuickFillDialog(channelIndex, platformIndex)"
+                            >
+                              <v-icon size="16">
+                                mdi-pencil-plus-outline
+                              </v-icon>
+                            </v-btn>
                           </td>
 
                           <!-- 月份金額輸入 -->
@@ -434,6 +525,56 @@
       :message="`確定要刪除「<span class='text-teal-darken-1' style='font-weight: 800;'> ${getPlatformName(confirmDeletePlatformDialog.platformId)} </span>」平台嗎？`"
       @confirm="confirmDeletePlatform"
     />
+
+    <!-- 快速填入金額對話框 -->
+    <v-dialog
+      v-model="quickFillDialog.show"
+      max-width="360"
+    >
+      <v-form
+        ref="quickFillForm"
+        @submit.prevent="validateAndApplyQuickFill"
+      >
+        <v-card class="px-6 pt-6 pb-4">
+          <div class="card-title">
+            快速填入月份金額
+          </div>
+          <v-card-text class="px-0 pb-2">
+            <div class="text-grey mb-4">
+              輸入金額將填入該平台的所有月份
+            </div>
+            <v-text-field
+              v-model="quickFillDialog.amount"
+              label="請輸入金額"
+              variant="outlined"
+              density="compact"
+              :error-messages="quickFillDialog.error"
+              @keyup.enter="validateAndApplyQuickFill"
+              @input="quickFillDialog.error = ''"
+            />
+          </v-card-text>
+          <v-card-actions class="px-0">
+            <v-spacer />
+            <v-btn
+              color="grey"
+              size="small"
+              variant="outlined"
+              @click="quickFillDialog.show = false"
+            >
+              取消
+            </v-btn>
+            <v-btn
+              color="teal-darken-1"
+              size="small"
+              variant="outlined"
+              type="submit"
+            >
+              確認
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -449,6 +590,7 @@ import { useUserStore } from '@/stores/user'
 import * as yup from 'yup'
 import ConfirmDeleteDialogWithTextField from '@/components/ConfirmDeleteDialogWithTextField.vue'
 import ConfirmDeleteDialog from '@/components/ConfirmDeleteDialog.vue'
+import { debounce } from 'lodash'
 
 // ===== 頁面設定 =====
 definePage({
@@ -750,36 +892,24 @@ const loadData = async () => {
       itemsPerPage: itemsPerPage.value
     }
 
-    // 處理條件搜尋
-    if (searchCriteria.value.year) {
-      params.year = Number(searchCriteria.value.year)  // 確保年度是數字
+    if (quickSearchText.value) {
+      params.search = quickSearchText.value
     }
+
+    if (searchCriteria.value.year) {
+      params.year = searchCriteria.value.year
+    }
+
     if (searchCriteria.value.theme) {
       params.theme = searchCriteria.value.theme
     }
 
     const { data } = await apiAuth.get('/marketing/budgets/all', { params })
-    console.log('預算表列表回應:', data) // 用於調試
-
     if (data.success) {
-      // 確保資料格式正確
-      items.value = data.result.data.map(item => ({
-        ...item,
-        totalBudget: item.items.reduce((total, budget) => {
-          const monthlyTotal = Object.values(budget.monthlyBudget).reduce((sum, value) => sum + (Number(value) || 0), 0)
-          return total + monthlyTotal
-        }, 0).toLocaleString()  // 格式化數字
-      }))
+      items.value = data.result.data
       totalItems.value = data.result.totalItems
-    } else {
-      console.error('載入預算表失敗:', data.message)
-      createSnackbar({
-        text: data.message || '載入預算表失敗',
-        snackbarProps: { color: 'red-lighten-1' }
-      })
     }
   } catch (error) {
-    console.error('載入預算表時發生錯誤:', error.response || error)
     handleError(error)
   } finally {
     isLoading.value = false
@@ -1107,6 +1237,88 @@ onMounted(async () => {
     loadOptions()
   ])
 })
+
+// 快速填入對話框狀態
+const quickFillDialog = ref({
+  show: false,
+  amount: '',
+  error: '',
+  channelIndex: -1,
+  platformIndex: -1
+})
+
+// 驗證並應用快速填入
+const validateAndApplyQuickFill = () => {
+  if (!quickFillDialog.value.amount) {
+    quickFillDialog.value.error = '請輸入金額'
+    return
+  }
+
+  const amount = Number(quickFillDialog.value.amount)
+  if (isNaN(amount) || amount < 0) {
+    quickFillDialog.value.error = '請輸入有效金額'
+    return
+  }
+
+  const { channelIndex, platformIndex } = quickFillDialog.value
+  if (channelIndex === -1 || platformIndex === -1) return
+
+  const platform = budgetData.value[channelIndex].platforms[platformIndex]
+  Object.keys(monthList).forEach(month => {
+    platform.budget[month] = amount
+  })
+
+  quickFillDialog.value.show = false
+  quickFillDialog.value.error = ''
+}
+
+// 顯示快速填入對話框
+const showQuickFillDialog = (channelIndex, platformIndex) => {
+  quickFillDialog.value = {
+    show: true,
+    amount: '',
+    error: '',
+    channelIndex,
+    platformIndex
+  }
+}
+
+// 在 script setup 中添加排序方法
+// 移動廣告渠道
+const moveChannel = (index, direction) => {
+  const newIndex = direction === 'up' ? index - 1 : index + 1
+  if (newIndex < 0 || newIndex >= budgetData.value.length) return
+  
+  const temp = budgetData.value[index]
+  budgetData.value[index] = budgetData.value[newIndex]
+  budgetData.value[newIndex] = temp
+}
+
+// 移動平台
+const movePlatform = (channelIndex, platformIndex, direction) => {
+  const platforms = budgetData.value[channelIndex].platforms
+  const newIndex = direction === 'up' ? platformIndex - 1 : platformIndex + 1
+  if (newIndex < 0 || newIndex >= platforms.length) return
+  
+  const temp = platforms[platformIndex]
+  platforms[platformIndex] = platforms[newIndex]
+  platforms[newIndex] = temp
+}
+
+// ===== 搜尋相關設定 =====
+const quickSearchText = ref('')
+
+// 使用 lodash 的 debounce 來優化搜尋
+const debouncedSearch = debounce(() => {
+  loadData()
+}, 300)
+
+// 處理快速搜尋
+const handleQuickSearch = () => {
+  isLoading.value = true
+  page.value = 1
+  debouncedSearch()
+}
 </script>
 
 <style lang="scss" scoped>
@@ -1125,6 +1337,7 @@ onMounted(async () => {
   width: 100%;
   min-width: 1720px;
   border: 1px solid #e0e0e0;
+  border-bottom: none;
   border-radius: 8px;
   border-spacing: 0;
 }
@@ -1143,21 +1356,24 @@ onMounted(async () => {
 
 tbody {
   tr {
-    height:64px;
+    height: 64px;
     &.row-odd {
-      background: #ebf3f3;
-    }
-    
-    &:hover {
-      td {
-        background: inherit;
-      }
+      background: #f3f7f7;
     }
   }
 
   td {
     padding: 8px;
     vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  .channel-col {
+    border-right: 1px solid #e0e0e0;
+  }
+
+  .quick-fill-col {
+    border-right: 1px solid #e0e0e0;
   }
 }
 
@@ -1186,26 +1402,79 @@ tbody {
 }
 
 .channel-col {
-  width: 220px;
+  width: 200px;
   .channel-select {
     width: 180px;
+  }
+  .sort-buttons-col {
+    margin-left: 8px;
+    border-bottom: none;
   }
 }
 
 .platform-col {
+  padding-right: 4px !important;
   width: 200px;
 }
 
 .month-col {
   min-width: 100px;
+  padding: 8px !important;
 }
 
 .delete-button {
-  margin-left: 12px;
+  margin-left: 16px;
   opacity: 0.7;
   transition: opacity 0.3s ease;
   &:hover {
     opacity: 1;
+  }
+}
+
+.month-input {
+  width: 100%;
+}
+
+.quick-fill-col {
+  width: 48px;
+  padding: 0 8px 0 0 !important;
+  text-align: center;
+}
+
+.sort-buttons-col {
+  width: 32px;
+  padding: 0 !important;
+  text-align: center;
+  
+  .v-btn {
+    margin: 2px 0;
+    opacity: 0.7;
+    
+    &:hover {
+      opacity: 1;
+    }
+    
+    &:disabled {
+      opacity: 0.3;
+    }
+  }
+}
+
+.sort-buttons-wrapper {
+  display: inline-flex;
+  align-items: center;
+  padding-left: 12px;
+  .v-btn {
+    margin: 2px 0;
+    opacity: 0.7;
+    
+    &:hover {
+      opacity: 1;
+    }
+    
+    &:disabled {
+      opacity: 0.3;
+    }
   }
 }
 </style>

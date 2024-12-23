@@ -464,7 +464,7 @@ const userItems = [
     roles: ['ADMIN', 'MANAGER']
   },
   {
-    to: '/advertisingBudget',
+    to: '/marketingAnalysis',
     text: '行銷費用分析',
     icon: 'mdi-chart-multiple',
     roles: ['ADMIN', 'MANAGER']

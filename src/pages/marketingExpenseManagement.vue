@@ -1,5 +1,5 @@
 <template>
-  <v-container max-width="2200">
+  <v-container max-width="2160">
     <v-row class="pt-md-5">
       <v-col 
         cols="12"
@@ -156,7 +156,7 @@
                 class="ms-auto d-flex align-center"
               >
                 <v-icon
-                  v-tooltip:start="'可搜尋花費金額、備註、建立者'"
+                  v-tooltip:start="'可搜尋備註、建立者'"
                   icon="mdi-information"
                   size="small"
                   color="deep-purple-darken-4"
@@ -182,6 +182,7 @@
             <v-data-table-server
               v-model:items-per-page="itemsPerPage"
               v-model:page="page"
+              density="compact"
               :headers="headers"
               :items="items"
               :items-length="totalItems"
@@ -194,6 +195,10 @@
 
               <template #[`item.expense`]="{ item }">
                 {{ formatNumber(item.expense) }}
+              </template>
+
+              <template #[`item.relatedBudget.theme.name`]="{ item }">
+                {{ item.relatedBudget ? `${item.relatedBudget.year} - ${item.relatedBudget.theme?.name || ''}` : '-' }}
               </template>
 
               <template #[`item.actions`]="{ item }">
@@ -306,7 +311,6 @@
                   v-model="expense.value.value"
                   :error-messages="expense.errorMessage.value"
                   label="*花費金額"
-                  type="number"
                   variant="outlined"
                   density="compact"
                   clearable
@@ -456,7 +460,7 @@ const schema = yup.object({
   channel: yup.string().required('請選擇廣告渠道'),
   platform: yup.string().required('請選擇平台'),
   detail: yup.string().required('請選擇細項'),
-  expense: yup.number().required('請填寫花費金額').min(0, '金額不能小於0'),
+  expense: yup.string().required('請填寫花費金額').min(0, '金額不能小於0'),
   relatedBudget: yup.string().nullable(),
   note: yup.string()
 })
@@ -490,6 +494,7 @@ const headers = [
   { title: '平台', key: 'platform.name', align: 'start', sortable: false },
   { title: '細項', key: 'detail.name', align: 'start', sortable: false },
   { title: '花費金額', key: 'expense', align: 'start', sortable: false },
+  { title: '關聯預算表', key: 'relatedBudget.theme.name', align: 'start', sortable: false },
   { title: '備註', key: 'note', align: 'start', sortable: false },
   { title: '建立者', key: 'creator.name', align: 'start', sortable: false },
   { title: '操作', key: 'actions', align: 'center', sortable: false }
@@ -526,6 +531,7 @@ const debouncedSearch = debounce(() => {
 
 // 重置搜尋
 const resetSearch = () => {
+  // 重置所有搜尋條件
   searchCriteria.value = {
     theme: null,
     channel: null,
@@ -534,14 +540,22 @@ const resetSearch = () => {
     relatedBudget: null,
     dateRange: []
   }
+  // 重置快速搜尋文字
   searchText.value = ''
-  performSearch()
+  // 重置頁碼並執行搜尋
+  page.value = 1
+  loadData()
 }
 
 // 執行搜尋
 const performSearch = async () => {
-  page.value = 1
-  await loadData()
+  try {
+    page.value = 1
+    await loadData()
+  } catch (error) {
+    console.error('搜尋時發生錯誤:', error)
+    handleError(error)
+  }
 }
 
 // ===== 計算屬性 =====
@@ -609,8 +623,8 @@ const loadData = async () => {
     }
 
     // 處理快速搜尋
-    if (searchText.value) {
-      params.search = searchText.value
+    if (searchText.value?.trim()) {
+      params.search = searchText.value.trim()
     }
 
     // 處理條件搜尋
@@ -631,29 +645,35 @@ const loadData = async () => {
     }
 
     // 處理日期範圍
-    if (searchCriteria.value.dateRange?.length > 0) {
+    if (searchCriteria.value.dateRange && searchCriteria.value.dateRange.length > 0) {
+      // 處理開始日期：設置為當天的開始時間 (00:00:00)
       const startDate = new Date(searchCriteria.value.dateRange[0])
       startDate.setHours(0, 0, 0, 0)
-      const endDate = searchCriteria.value.dateRange.length > 1 
-        ? new Date(searchCriteria.value.dateRange[searchCriteria.value.dateRange.length - 1])
-        : new Date(searchCriteria.value.dateRange[0])
+      
+      // 處理結束日期：設置為當天的結束時間 (23:59:59.999)
+      const endDate = new Date(searchCriteria.value.dateRange[searchCriteria.value.dateRange.length - 1])
       endDate.setHours(23, 59, 59, 999)
       
+      // 設置搜尋參數
       params.startDate = startDate.toISOString()
       params.endDate = endDate.toISOString()
+
+      // 調試日誌
+      console.log('前端日期處理:', {
+        原始日期範圍: searchCriteria.value.dateRange,
+        處理後起始日期: startDate.toLocaleString(),
+        處理後結束日期: endDate.toLocaleString(),
+        startDate_ISO: params.startDate,
+        endDate_ISO: params.endDate,
+        當前時區: Intl.DateTimeFormat().resolvedOptions().timeZone
+      })
     }
+
+    console.log('搜尋參數:', params) // 用於調試
 
     const { data } = await apiAuth.get('/marketing/expenses/all', { params })
     if (data.success) {
-      items.value = data.result.data.map(item => ({
-        ...item,
-        theme: { ...item.theme },
-        channel: { ...item.channel },
-        platform: { ...item.platform },
-        detail: { ...item.detail },
-        creator: { ...item.creator },
-        relatedBudget: item.relatedBudget ? { ...item.relatedBudget } : null
-      }))
+      items.value = data.result.data
       totalItems.value = data.result.totalItems
     }
   } catch (error) {
@@ -829,6 +849,7 @@ const deleteExpense = async () => {
 }
 
 const handleSearch = () => {
+  isSearching.value = true
   page.value = 1
   debouncedSearch()
 }
@@ -865,6 +886,7 @@ onMounted(async () => {
   thead {
     background: #5c0199;
     color: #fff;
+    
   }
   .v-data-table__tr {
     &:nth-child(odd) {

@@ -444,7 +444,9 @@ const actionOptions = [
 const modelOptions = [
   { title: '使用者', value: 'users' },
   { title: '表單', value: 'forms' },
-  { title: '表單模板', value: 'formTemplates' }
+  { title: '表單模板', value: 'formTemplates' },
+  { title: '行銷分類', value: 'marketingCategories' },
+  { title: '行銷花費', value: 'marketingExpenses' }
 ]
 
 // 表格標頭
@@ -478,7 +480,7 @@ const filteredHeaders = computed(() => {
 
 // 欄位名稱翻譯
 const fieldTranslations = {
-  name: '姓名',
+  name: '資料名稱',
   email: '電子郵件',
   role: '權限',
   userId: '使用者編號',
@@ -491,6 +493,16 @@ const fieldTranslations = {
   note: '備註',
   isActive: '啟用狀態',
   employmentStatus: '任職狀態',
+  marketingExpenses: '實際花費',
+  marketingBudgets: '行銷預算',
+}
+
+// 行銷分類類型對應
+const marketingCategoryTypes = {
+  0: '行銷主題',
+  1: '廣告渠道',
+  2: '平台',
+  3: '細項'
 }
 
 // 格式化函數
@@ -515,7 +527,10 @@ const getModelDisplay = (model) => {
   const modelMap = {
     users: '使用者',
     forms: '表單',
-    formTemplates: '表單模板'
+    formTemplates: '表單模板',
+    marketingCategories: '行銷分類',
+    marketingExpenses: '行銷花費',
+    marketingBudgets: '行銷預算'
   }
   return modelMap[model] || model
 }
@@ -531,8 +546,15 @@ const formatOperator = (item) => {
 
 const formatTarget = (item) => {
   if (!item?.targetInfo) return '-'
-  const { name, userId, formNumber } = item.targetInfo
+  const { name, userId, formNumber, invoiceDate, theme } = item.targetInfo
   if (formNumber) return `${formNumber}`
+  if (item.targetModel === 'marketingCategories') {
+    return name || '-'
+  }
+  if (item.targetModel === 'marketingExpenses') {
+    const date = formatDateTime(invoiceDate).split(' ')[0] // 只取日期部分
+    return `${date} - ${theme}`
+  }
   return `${name}${userId ? ` (${userId})` : ''}`
 }
 
@@ -561,7 +583,11 @@ const formatChanges = (item) => {
         else if (typeof value === 'boolean') {
           changes.push(`${fieldTranslations[key]}: ${formatBoolean(value)}`)
         }
-        // 處���空值或 undefined
+        // 特殊處理行銷分類的類型
+        else if (key === 'type' && item.targetModel === 'marketingCategories') {
+          changes.push(`${fieldTranslations[key]}: ${marketingCategoryTypes[value] || '(無)'}`)
+        }
+        // 處理其他欄位
         else {
           changes.push(`${fieldTranslations[key]}: ${value || '(無)'}`)
         }
@@ -586,6 +612,10 @@ const formatChanges = (item) => {
       // 特殊處理布林值
       else if (typeof before[key] === 'boolean' || typeof after[key] === 'boolean') {
         changes.push(`${fieldTranslations[key]}: ${formatBoolean(before[key])} → ${formatBoolean(after[key])}`)
+      }
+      // 特殊處理行銷分類��類型
+      else if (key === 'type' && item.targetModel === 'marketingCategories') {
+        changes.push(`${fieldTranslations[key]}: ${marketingCategoryTypes[before[key]] || '(無)'} → ${marketingCategoryTypes[after[key]] || '(無)'}`)
       }
       else {
         changes.push(`${fieldTranslations[key]}: ${before[key] || '(無)'} → ${after[key] || '(無)'}`)
@@ -652,6 +682,10 @@ const handleTargetSearch = debounce(async (text) => {
         endpoint = '/formTemplates/suggestions'
         params = { search: text }
         break
+      case 'marketingCategories':
+        endpoint = '/marketing/categories/all'
+        params = { quickSearch: text }
+        break
       default:
         return
     }
@@ -661,8 +695,20 @@ const handleTargetSearch = debounce(async (text) => {
     console.log('API 回應:', data)
     
     if (data.success) {
-      if (targetType.value === 'formTemplates') {
-        // 確保回傳的資料格式正確
+      if (targetType.value === 'marketingCategories') {
+        // 合併所有類型的行銷分類數據
+        const allCategories = [
+          ...data.result.marketingThemes.data,
+          ...data.result.advertisingChannels.data,
+          ...data.result.platforms.data,
+          ...data.result.details.data
+        ]
+        targetSuggestions.value = allCategories.map(item => ({
+          _id: item._id,
+          name: item.name,
+          type: item.type
+        }))
+      } else if (targetType.value === 'formTemplates') {
         targetSuggestions.value = data.result.map(item => ({
           _id: item._id,
           name: item.name
@@ -814,6 +860,8 @@ const formatUserDisplay = (user) => {
 const formatTargetDisplay = (item) => {
   if (!item) return ''
   
+  let date
+  
   switch (targetType.value) {
     case 'users':
       if (item.adminId) {
@@ -824,6 +872,11 @@ const formatTargetDisplay = (item) => {
       return `${item.formNumber}${item.clientName ? ` - ${item.clientName}` : ''}`
     case 'formTemplates':
       return item.name || ''
+    case 'marketingCategories':
+      return `${item.name} (${marketingCategoryTypes[item.type]})`
+    case 'marketingExpenses':
+      date = formatDateTime(item.invoiceDate).split(' ')[0] // 只取日期部分
+      return `${date} - ${item.theme?.name || ''}`
     default:
       return ''
   }
