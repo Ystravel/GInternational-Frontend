@@ -44,6 +44,19 @@
                       clearable
                       class="mb-6"
                     />
+                    <v-date-input
+                      v-model="searchCriteria.createdDateRange"
+                      label="建立日期"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      multiple="range"
+                      prepend-icon
+                      clearable
+                      :cancel-text="'取消'"
+                      :ok-text="'確認'"
+                      class="mb-6"
+                    />
                     <v-row class="d-flex justify-space-between">
                       <v-col cols="3">
                         <v-btn
@@ -150,6 +163,12 @@
                 >
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
+              </template>
+              <template #[`item.totalBudget`]="{ item }">
+                {{ formatNumber(item.totalBudget) }}
+              </template>
+              <template #[`item.createdAt`]="{ item }">
+                {{ formatDate(item.createdAt) }}
               </template>
             </v-data-table-server>
           </v-col>
@@ -505,7 +524,7 @@
       v-model="confirmDeleteDialog"
       title="確認刪除預算表"
       :message="`確定要刪除「<span class='text-pink-lighten-1' style='font-weight: 800;'>${originalData?.year}年度${originalData?.theme?.name}</span>」的預算表嗎？此操作無法復原。`"
-      :expected-name="`${originalData?.year}年${originalData?.theme?.name}`"
+      :expected-name="`${originalData?.year}年度${originalData?.theme?.name}`"
       input-label="預算表名稱"
       @confirm="deleteBudget"
     />
@@ -535,8 +554,8 @@
         ref="quickFillForm"
         @submit.prevent="validateAndApplyQuickFill"
       >
-        <v-card class="px-6 pt-6 pb-4">
-          <div class="card-title">
+        <v-card class="px-6 pt-6 pb-3">
+          <div class="card-title mb-2">
             快速填入月份金額
           </div>
           <v-card-text class="px-0 pb-2">
@@ -553,7 +572,7 @@
               @input="quickFillDialog.error = ''"
             />
           </v-card-text>
-          <v-card-actions class="px-0">
+          <v-card-actions class="px-0 pt-0">
             <v-spacer />
             <v-btn
               color="grey"
@@ -591,6 +610,8 @@ import * as yup from 'yup'
 import ConfirmDeleteDialogWithTextField from '@/components/ConfirmDeleteDialogWithTextField.vue'
 import ConfirmDeleteDialog from '@/components/ConfirmDeleteDialog.vue'
 import { debounce } from 'lodash'
+import { formatNumber } from '@/utils/format'
+
 
 // ===== 頁面設定 =====
 definePage({
@@ -647,6 +668,7 @@ const dialog = ref({
 
 // ===== 表格設定 =====
 const headers = [
+  { title: '建立日期', key: 'createdAt', align: 'start', sortable: false },
   { title: '年度', key: 'year', align: 'start', sortable: false },
   { title: '行銷主題', key: 'theme.name', align: 'start', sortable: false },
   { title: '總預算', key: 'totalBudget', align: 'start', sortable: false },
@@ -669,7 +691,8 @@ const platformOptions = ref([])
 // ===== 搜尋相關設定 =====
 const searchCriteria = ref({
   year: null,
-  theme: null
+  theme: null,
+  createdDateRange: []
 })
 
 // ===== 月份列表 =====
@@ -904,6 +927,20 @@ const loadData = async () => {
       params.theme = searchCriteria.value.theme
     }
 
+    // 處理建立日期範圍
+    if (searchCriteria.value.createdDateRange && searchCriteria.value.createdDateRange.length > 0) {
+      const startDate = new Date(searchCriteria.value.createdDateRange[0])
+      startDate.setHours(0, 0, 0, 0)
+      
+      const endDate = new Date(searchCriteria.value.createdDateRange[searchCriteria.value.createdDateRange.length - 1])
+      endDate.setHours(23, 59, 59, 999)
+      
+      params.createdDateStart = startDate.toISOString()
+      params.createdDateEnd = endDate.toISOString()
+    }
+
+    console.log('搜尋參數:', params)
+
     const { data } = await apiAuth.get('/marketing/budgets/all', { params })
     if (data.success) {
       items.value = data.result.data
@@ -950,7 +987,8 @@ const loadOptions = async () => {
 const resetSearch = () => {
   searchCriteria.value = {
     year: null,
-    theme: null
+    theme: null,
+    createdDateRange: []
   }
   performSearch()
 }
@@ -1319,6 +1357,41 @@ const handleQuickSearch = () => {
   page.value = 1
   debouncedSearch()
 }
+
+// 新增日期格式化函數
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  
+  // 創建一個 UTC 日期對象
+  const utcDate = new Date(dateString)
+  
+  // 轉換為台灣時間（UTC+8）
+  const taiwanDate = new Date(utcDate.getTime() + (8 * 60 * 60 * 1000))
+  
+  const year = taiwanDate.getUTCFullYear()
+  const month = String(taiwanDate.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(taiwanDate.getUTCDate()).padStart(2, '0')
+  
+  return `${year}/${month}/${day}`
+}
+
+// 新增日期驗證監聽
+watch(
+  () => searchCriteria.value.createdDateRange,
+  (newCreatedDateRange) => {
+    if (newCreatedDateRange && newCreatedDateRange.length > 0) {
+      const start = new Date(newCreatedDateRange[0])
+      const end = new Date(newCreatedDateRange[newCreatedDateRange.length - 1])
+      if (start > end) {
+        createSnackbar({
+          text: '建立日期的結束日期不能早於開始日期',
+          snackbarProps: { color: 'warning' }
+        })
+        searchCriteria.value.createdDateRange = []
+      }
+    }
+  }
+)
 </script>
 
 <style lang="scss" scoped>

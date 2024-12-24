@@ -495,6 +495,14 @@ const fieldTranslations = {
   employmentStatus: '任職狀態',
   marketingExpenses: '實際花費',
   marketingBudgets: '行銷預算',
+  expense: '花費金額',
+  invoiceDate: '發票日期',
+  theme: '行銷主題',
+  channel: '廣告渠道',
+  platform: '平台',
+  detail: '線別',
+  relatedBudget: '關聯預算表',
+  year: '年度'
 }
 
 // 行銷分類類型對應
@@ -502,7 +510,7 @@ const marketingCategoryTypes = {
   0: '行銷主題',
   1: '廣告渠道',
   2: '平台',
-  3: '細項'
+  3: '線別'
 }
 
 // 格式化函數
@@ -600,25 +608,28 @@ const formatChanges = (item) => {
   }
 
   // 處理修改和刪除操作
-  const { before = {}, after = {} } = item.changes
+  const { before = {}, after = {}, changedFields = [] } = item.changes
   
-  // 只處理 after 中存在的欄位
-  Object.keys(after).forEach(key => {
-    if (fieldTranslations[key] && before[key] !== after[key]) {
+  changedFields.forEach(key => {
+    if (fieldTranslations[key]) {
+      const oldValue = before[key]
+      const newValue = after[key]
+      
       // 特殊處理 role 欄位
       if (key === 'role') {
-        changes.push(`${fieldTranslations[key]}: ${formatRole(before[key])} → ${formatRole(after[key])}`)
+        changes.push(`${fieldTranslations[key]}: ${formatRole(oldValue)} → ${formatRole(newValue)}`)
       }
       // 特殊處理布林值
-      else if (typeof before[key] === 'boolean' || typeof after[key] === 'boolean') {
-        changes.push(`${fieldTranslations[key]}: ${formatBoolean(before[key])} → ${formatBoolean(after[key])}`)
+      else if (typeof oldValue === 'boolean' || typeof newValue === 'boolean') {
+        changes.push(`${fieldTranslations[key]}: ${formatBoolean(oldValue)} → ${formatBoolean(newValue)}`)
       }
-      // 特殊處理行銷分類��類型
+      // 特殊處理行銷分類的類型
       else if (key === 'type' && item.targetModel === 'marketingCategories') {
-        changes.push(`${fieldTranslations[key]}: ${marketingCategoryTypes[before[key]] || '(無)'} → ${marketingCategoryTypes[after[key]] || '(無)'}`)
+        changes.push(`${fieldTranslations[key]}: ${marketingCategoryTypes[oldValue] || '(無)'} → ${marketingCategoryTypes[newValue] || '(無)'}`)
       }
+      // 處理其他欄位
       else {
-        changes.push(`${fieldTranslations[key]}: ${before[key] || '(無)'} → ${after[key] || '(無)'}`)
+        changes.push(`${fieldTranslations[key]}: ${oldValue || '(無)'} → ${newValue || '(無)'}`)
       }
     }
   })

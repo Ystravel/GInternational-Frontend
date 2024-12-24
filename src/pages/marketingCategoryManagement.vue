@@ -8,7 +8,7 @@
       <!-- 標題區塊 -->
       <v-col 
         cols="12"
-        class="ps-3 pb-6 d-flex align-center"
+        class="ps-3 pb-3 d-flex align-center"
       >
         <h3
           class="d-inline"
@@ -248,7 +248,7 @@
             </v-card>
           </v-col>
 
-          <!-- 細項列 -->
+          <!-- 線別列 -->
           <v-col
             cols="12"
             sm="3"
@@ -258,9 +258,9 @@
               elevation="0"
             >
               <div class="card-title mt-3 mb-2 mx-8 d-flex align-center justify-space-between">
-                細項
+                線別
                 <v-btn
-                  v-tooltip:start="'新增細項'"
+                  v-tooltip:start="'新增線別'"
                   icon
                   size="small"
                   variant="plain"
@@ -282,7 +282,7 @@
                   >
                     <template #append>
                       <v-btn
-                        v-tooltip:start="'編輯細項'"
+                        v-tooltip:start="'編輯線別'"
                         icon
                         color="light-blue-darken-4"
                         variant="plain"
@@ -475,7 +475,7 @@ const details = ref([])
 
 // ===== 計算屬性 =====
 const getDialogTitle = computed(() => {
-  const titles = ['新增行銷主題', '新增廣告渠道', '新增平台', '新增細項']
+  const titles = ['新增行銷主題', '新增廣告渠道', '新增平台', '新增線別']
   return titles[dialog.value.type]
 })
 
@@ -706,8 +706,8 @@ onMounted(async () => {
 const pages = ref({
   0: 1, // 行銷主題的當前頁碼
   1: 1, // 廣告渠道的當前頁碼
-  2: 1, // 平台的���前頁碼
-  3: 1  // 細項的當前頁碼
+  2: 1, // 平台的當前頁碼
+  3: 1  // 線別的當前頁碼
 })
 
 const totalPages = ref({
