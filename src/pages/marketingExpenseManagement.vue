@@ -444,11 +444,12 @@
                                   icon
                                   color="error"
                                   variant="plain"
-                                  :ripple="false"
-                                  size="small"
+                                  size="32"
                                   @click="removeDetail(index)"
                                 >
-                                  <v-icon>mdi-delete</v-icon>
+                                  <v-icon size="18">
+                                    mdi-delete
+                                  </v-icon>
                                 </v-btn>
                               </div>
                             </div>
@@ -467,7 +468,7 @@
               </v-row>
             </v-card-text>
 
-            <v-card-actions class="px-8">
+            <v-card-actions class="px-5">
               <v-hover>
                 <template #default="{ isHovering, props }">
                   <v-btn
@@ -750,7 +751,6 @@ const dialog = ref({
 
 // ===== 表格設定 =====
 const headers = [
-  { title: '建立日期', key: 'createdAt', align: 'start', sortable: false },
   { title: '發票日期', key: 'invoiceDate', align: 'start', sortable: false },
   { title: '行銷主題', key: 'theme.name', align: 'start', sortable: false },
   { title: '廣告渠道', key: 'channel.name', align: 'start', sortable: false },
@@ -759,6 +759,7 @@ const headers = [
   { title: '總金額', key: 'totalExpense', align: 'start', sortable: false },
   { title: '備註', key: 'note', align: 'start', sortable: false },
   { title: '建立者', key: 'creator.name', align: 'start', sortable: false },
+  { title: '建立日期', key: 'createdAt', align: 'start', sortable: false },
   { title: '操作', key: 'actions', align: 'center', sortable: false }
 ]
 

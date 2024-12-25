@@ -17,7 +17,6 @@
           class="mt-8"
           :label="`請輸入${labelText}`"
           variant="outlined"
-          dense
           clearable
         />
       </v-card-text>
