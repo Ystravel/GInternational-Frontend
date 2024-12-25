@@ -316,7 +316,6 @@ import { useRouter } from 'vue-router'
 import { formatNumber } from '@/utils/format'
 import { definePage } from 'vue-router/auto'
 import UserRole from '@/enums/UserRole'
-import * as XLSX from 'xlsx'
 import html2pdf from 'html2pdf.js'
 
 // ===== 頁面設定 =====
@@ -504,130 +503,76 @@ const exportToExcel = async () => {
   try {
     isExporting.value = true
     
-    // 建立工作表
-    const ws = XLSX.utils.aoa_to_sheet([
-      [`${searchForm.value.year}年度 ${getThemeName(searchForm.value.theme)} ${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}`],
-      [],
-      ['廣告渠道', '平台', 'JAN', 'FEB', 'MAR', 'Q1', 'APR', 'MAY', 'JUN', 'Q2', 'JUL', 'AUG', 'SEP', 'Q3', 'OCT', 'NOV', 'DEC', 'Q4', 'Total']
-    ])
-
-    // 設定標題合併儲存格
-    ws['!merges'] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: 18 } }  // 合併第一行的所有列
-    ]
-
-    // 設定欄寬
-    const colWidth = [
-      { wch: 15 },  // 廣告渠道
-      { wch: 15 },  // 平台
-      { wch: 12 },  // JAN
-      { wch: 12 },  // FEB
-      { wch: 12 },  // MAR
-      { wch: 12 },  // Q1
-      { wch: 12 },  // APR
-      { wch: 12 },  // MAY
-      { wch: 12 },  // JUN
-      { wch: 12 },  // Q2
-      { wch: 12 },  // JUL
-      { wch: 12 },  // AUG
-      { wch: 12 },  // SEP
-      { wch: 12 },  // Q3
-      { wch: 12 },  // OCT
-      { wch: 12 },  // NOV
-      { wch: 12 },  // DEC
-      { wch: 12 },  // Q4
-      { wch: 15 }   // Total
-    ]
-    ws['!cols'] = colWidth
-
-    // 添加數據
+    // 準備 CSV 內容
+    const headers = ['廣告渠道', '平台', 'JAN', 'FEB', 'MAR', 'Q1', 'APR', 'MAY', 'JUN', 'Q2', 'JUL', 'AUG', 'SEP', 'Q3', 'OCT', 'NOV', 'DEC', 'Q4', 'Total']
+    let csvContent = `${searchForm.value.year}年度 ${getThemeName(searchForm.value.theme)} ${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}\n\n`
+    
+    // 添加表頭
+    csvContent += headers.join(',') + '\n'
+    
+    // 添加數據行
     reportData.value.forEach(channel => {
       channel.platforms.forEach(platform => {
         const row = [
-          { v: channel.channelName, t: 's', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.platformName, t: 's', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.JAN, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.FEB, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.MAR, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: getQuarterTotal(platform.budget, 1), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-          { v: platform.budget.APR, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.MAY, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.JUN, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: getQuarterTotal(platform.budget, 2), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-          { v: platform.budget.JUL, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.AUG, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.SEP, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: getQuarterTotal(platform.budget, 3), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-          { v: platform.budget.OCT, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.NOV, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: platform.budget.DEC, t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' } } },
-          { v: getQuarterTotal(platform.budget, 4), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-          { v: getPlatformTotal(platform.budget), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E2E2E2' }, patternType: 'solid' } } }
+          channel.channelName,
+          platform.platformName,
+          platform.budget.JAN || 0,
+          platform.budget.FEB || 0,
+          platform.budget.MAR || 0,
+          getQuarterTotal(platform.budget, 1),
+          platform.budget.APR || 0,
+          platform.budget.MAY || 0,
+          platform.budget.JUN || 0,
+          getQuarterTotal(platform.budget, 2),
+          platform.budget.JUL || 0,
+          platform.budget.AUG || 0,
+          platform.budget.SEP || 0,
+          getQuarterTotal(platform.budget, 3),
+          platform.budget.OCT || 0,
+          platform.budget.NOV || 0,
+          platform.budget.DEC || 0,
+          getQuarterTotal(platform.budget, 4),
+          getPlatformTotal(platform.budget)
         ]
-        XLSX.utils.sheet_add_aoa(ws, [row.map(cell => cell.v)], { origin: -1 })
-        
-        // 設定最後添加的行的樣式
-        const lastRow = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).e.r : 3
-        row.forEach((cell, index) => {
-          const cellRef = XLSX.utils.encode_cell({ r: lastRow, c: index })
-          if (!ws[cellRef]) ws[cellRef] = {}
-          ws[cellRef].s = cell.s
-        })
+        csvContent += row.join(',') + '\n'
       })
     })
-
-    // 添加月度總計
+    
+    // 添加總計行
     const totalRow = [
-      { v: '月度總計', t: 's', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: '', t: 's', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('JAN'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('FEB'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('MAR'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getQuarterlyTotal(1), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('APR'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('MAY'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('JUN'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getQuarterlyTotal(2), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('JUL'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('AUG'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('SEP'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getQuarterlyTotal(3), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('OCT'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('NOV'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getMonthlyTotal('DEC'), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'E9ECEF' }, patternType: 'solid' } } },
-      { v: getQuarterlyTotal(4), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFE0B2' }, patternType: 'solid' } } },
-      { v: getGrandTotal(), t: 'n', s: { alignment: { horizontal: 'center', vertical: 'center' }, fill: { fgColor: { rgb: 'FFD700' }, patternType: 'solid' } } }
+      '月度總計', '',
+      getMonthlyTotal('JAN'),
+      getMonthlyTotal('FEB'),
+      getMonthlyTotal('MAR'),
+      getQuarterlyTotal(1),
+      getMonthlyTotal('APR'),
+      getMonthlyTotal('MAY'),
+      getMonthlyTotal('JUN'),
+      getQuarterlyTotal(2),
+      getMonthlyTotal('JUL'),
+      getMonthlyTotal('AUG'),
+      getMonthlyTotal('SEP'),
+      getQuarterlyTotal(3),
+      getMonthlyTotal('OCT'),
+      getMonthlyTotal('NOV'),
+      getMonthlyTotal('DEC'),
+      getQuarterlyTotal(4),
+      getGrandTotal()
     ]
-    XLSX.utils.sheet_add_aoa(ws, [totalRow.map(cell => cell.v)], { origin: -1 })
+    csvContent += totalRow.join(',')
     
-    // 設定最後一行的樣式
-    const lastRow = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).e.r : 3
-    totalRow.forEach((cell, index) => {
-      const cellRef = XLSX.utils.encode_cell({ r: lastRow, c: index })
-      if (!ws[cellRef]) ws[cellRef] = {}
-      ws[cellRef].s = cell.s
-    })
-
-    // 建立工作簿並下載
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'Report')
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-    const fileName = `${searchForm.value.year}年度${getThemeName(searchForm.value.theme)}${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}.xlsx`
-    
-    // 使用原生方法下載
-    const blob = new Blob([excelBuffer], { 
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-    })
+    // 轉換為 Blob 並下載
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = fileName
+    link.download = `${searchForm.value.year}年度${getThemeName(searchForm.value.theme)}${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}.csv`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     URL.revokeObjectURL(url)
 
-    createSnackbar({ text: 'Excel 匯出成功', snackbarProps: { color: 'success' } })
+    createSnackbar({ text: 'CSV 匯出成功', snackbarProps: { color: 'success' } })
   } catch (error) {
     handleError(error)
   } finally {
