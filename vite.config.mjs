@@ -75,15 +75,16 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      external: ['file-saver'],
+      external: ['file-saver', 'xlsx'],
       output: {
         globals: {
-          'file-saver': 'FileSaver'
+          'file-saver': 'FileSaver',
+          'xlsx': 'XLSX'
         }
       }
     }
   },
   optimizeDeps: {
-    include: ['file-saver']
+    include: ['file-saver', 'xlsx']
   }
 })
