@@ -73,4 +73,17 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      external: ['file-saver'],
+      output: {
+        globals: {
+          'file-saver': 'FileSaver'
+        }
+      }
+    }
+  },
+  optimizeDeps: {
+    include: ['file-saver']
+  }
 })

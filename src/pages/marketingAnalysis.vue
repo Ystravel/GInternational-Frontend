@@ -316,7 +316,7 @@ import { useRouter } from 'vue-router'
 import { formatNumber } from '@/utils/format'
 import { definePage } from 'vue-router/auto'
 import UserRole from '@/enums/UserRole'
-import { saveAs } from 'file-saver/dist/FileSaver.min.js'
+import { saveAs } from 'file-saver'
 import * as XLSX from 'xlsx'
 import html2pdf from 'html2pdf.js'
 
@@ -479,7 +479,7 @@ const getMonthlyTotal = (month) => {
   }, 0)
 }
 
-// 計���季度總額
+// 計算季度總額
 const getQuarterlyTotal = (quarter) => {
   const monthMap = {
     1: ['JAN', 'FEB', 'MAR'],
@@ -635,7 +635,7 @@ const exportToPDF = async () => {
       throw new Error('找不到表格元素')
     }
 
-    // 創建一個臨時容器
+    // 創建一���臨時容器
     const container = document.createElement('div')
     container.style.width = '1920px'
     container.style.backgroundColor = 'white'
