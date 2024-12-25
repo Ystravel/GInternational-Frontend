@@ -614,7 +614,14 @@ const exportToExcel = async () => {
     XLSX.utils.book_append_sheet(wb, ws, 'Report')
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
     const fileName = `${searchForm.value.year}年度${getThemeName(searchForm.value.theme)}${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}.xlsx`
-    saveAs(new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), fileName)
+    
+    // 使用 saveAs 而不是 FileSaver.saveAs
+    saveAs(
+      new Blob([excelBuffer], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      }), 
+      fileName
+    )
 
     createSnackbar({ text: 'Excel 匯出成功', snackbarProps: { color: 'success' } })
   } catch (error) {
@@ -635,7 +642,7 @@ const exportToPDF = async () => {
       throw new Error('找不到表格元素')
     }
 
-    // 創建一���臨時容器
+    // 創建一個臨時容器
     const container = document.createElement('div')
     container.style.width = '1920px'
     container.style.backgroundColor = 'white'
@@ -739,7 +746,7 @@ const exportToPDF = async () => {
         cell.style.backgroundColor = '#e9ecef'
         cell.style.fontWeight = 'bold'
         
-        // 確保月度總計列中的季度欄位保持橘色背景
+        // 確保月度總計列中的季度欄保持橘色背景
         if (cell.classList.contains('quarter-col')) {
           cell.style.backgroundColor = '#FFE0B2'
         }

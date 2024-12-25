@@ -73,18 +73,12 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    rollupOptions: {
-      external: ['file-saver', 'xlsx'],
-      output: {
-        globals: {
-          'file-saver': 'FileSaver',
-          'xlsx': 'XLSX'
-        }
-      }
-    }
-  },
   optimizeDeps: {
     include: ['file-saver', 'xlsx']
+  },
+  build: {
+    commonjsOptions: {
+      include: [/file-saver/, /xlsx/]
+    }
   }
 })
