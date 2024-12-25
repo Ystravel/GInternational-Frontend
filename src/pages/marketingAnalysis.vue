@@ -316,7 +316,6 @@ import { useRouter } from 'vue-router'
 import { formatNumber } from '@/utils/format'
 import { definePage } from 'vue-router/auto'
 import UserRole from '@/enums/UserRole'
-import { saveAs } from 'file-saver'
 import * as XLSX from 'xlsx'
 import html2pdf from 'html2pdf.js'
 
@@ -615,13 +614,18 @@ const exportToExcel = async () => {
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
     const fileName = `${searchForm.value.year}年度${getThemeName(searchForm.value.theme)}${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}.xlsx`
     
-    // 使用 saveAs 而不是 FileSaver.saveAs
-    saveAs(
-      new Blob([excelBuffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-      }), 
-      fileName
-    )
+    // 使用原生方法下載
+    const blob = new Blob([excelBuffer], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
 
     createSnackbar({ text: 'Excel 匯出成功', snackbarProps: { color: 'success' } })
   } catch (error) {
@@ -746,7 +750,7 @@ const exportToPDF = async () => {
         cell.style.backgroundColor = '#e9ecef'
         cell.style.fontWeight = 'bold'
         
-        // 確保月度總計列中的季度欄保持橘色背景
+        // 確保月度總計列中的季度欄位保持橘色背景
         if (cell.classList.contains('quarter-col')) {
           cell.style.backgroundColor = '#FFE0B2'
         }
