@@ -72,13 +72,5 @@ export default defineConfig({
         api: 'modern-compiler',
       },
     },
-  },
-  optimizeDeps: {
-    include: ['file-saver', 'xlsx']
-  },
-  build: {
-    commonjsOptions: {
-      include: [/file-saver/, /xlsx/]
-    }
   }
 })
