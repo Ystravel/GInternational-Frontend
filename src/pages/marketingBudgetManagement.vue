@@ -189,8 +189,17 @@
         @submit.prevent="submit"
       >
         <v-card class="rounded-lg pb-4">
-          <div class="card-title px-6 py-6">
+          <div class="card-title px-6 py-6 d-flex justify-space-between align-center">
             {{ dialog.id ? '編輯預算表' : '新增預算表' }}
+            <v-btn
+              icon
+              color="red-lighten-1"
+              variant="plain"
+              :size="buttonSize"
+              @click="closeDialog"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
           </div>
 
           <v-card-text>
