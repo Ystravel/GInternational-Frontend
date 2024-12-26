@@ -499,17 +499,32 @@ const getGrandTotal = () => {
 }
 
 // 匯出 Excel
+const loadXLSX = async () => {
+  if (window.XLSX) return window.XLSX
+  
+  await new Promise((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js'
+    script.onload = resolve
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
+  
+  return window.XLSX
+}
+
 const exportToExcel = async () => {
   try {
     isExporting.value = true
+    const XLSX = await loadXLSX()
     
-    // 準備 CSV 內容
-    const headers = ['廣告渠道', '平台', 'JAN', 'FEB', 'MAR', 'Q1', 'APR', 'MAY', 'JUN', 'Q2', 'JUL', 'AUG', 'SEP', 'Q3', 'OCT', 'NOV', 'DEC', 'Q4', 'Total']
-    let csvContent = `${searchForm.value.year}年度 ${getThemeName(searchForm.value.theme)} ${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}\n\n`
-    
-    // 添加表頭
-    csvContent += headers.join(',') + '\n'
-    
+    // 建立工作表
+    const ws = XLSX.utils.aoa_to_sheet([
+      [`${searchForm.value.year}年度 ${getThemeName(searchForm.value.theme)} ${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}`],
+      [],
+      ['廣告渠道', '平台', 'JAN', 'FEB', 'MAR', 'Q1', 'APR', 'MAY', 'JUN', 'Q2', 'JUL', 'AUG', 'SEP', 'Q3', 'OCT', 'NOV', 'DEC', 'Q4', 'Total']
+    ])
+
     // 添加數據行
     reportData.value.forEach(channel => {
       channel.platforms.forEach(platform => {
@@ -534,45 +549,16 @@ const exportToExcel = async () => {
           getQuarterTotal(platform.budget, 4),
           getPlatformTotal(platform.budget)
         ]
-        csvContent += row.join(',') + '\n'
+        XLSX.utils.sheet_add_json(ws, [row], { skipHeader: true, origin: -1 })
       })
     })
-    
-    // 添加總計行
-    const totalRow = [
-      '月度總計', '',
-      getMonthlyTotal('JAN'),
-      getMonthlyTotal('FEB'),
-      getMonthlyTotal('MAR'),
-      getQuarterlyTotal(1),
-      getMonthlyTotal('APR'),
-      getMonthlyTotal('MAY'),
-      getMonthlyTotal('JUN'),
-      getQuarterlyTotal(2),
-      getMonthlyTotal('JUL'),
-      getMonthlyTotal('AUG'),
-      getMonthlyTotal('SEP'),
-      getQuarterlyTotal(3),
-      getMonthlyTotal('OCT'),
-      getMonthlyTotal('NOV'),
-      getMonthlyTotal('DEC'),
-      getQuarterlyTotal(4),
-      getGrandTotal()
-    ]
-    csvContent += totalRow.join(',')
-    
-    // 轉換為 Blob 並下載
-    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${searchForm.value.year}年度${getThemeName(searchForm.value.theme)}${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}.csv`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
 
-    createSnackbar({ text: 'CSV 匯出成功', snackbarProps: { color: 'success' } })
+    // 下載檔案
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Report')
+    XLSX.writeFile(wb, `${searchForm.value.year}年度${getThemeName(searchForm.value.theme)}${reportTypeOptions.value.find(option => option.value === searchForm.value.reportType)?.title || ''}.xlsx`)
+
+    createSnackbar({ text: 'Excel 匯出成功', snackbarProps: { color: 'success' } })
   } catch (error) {
     handleError(error)
   } finally {
