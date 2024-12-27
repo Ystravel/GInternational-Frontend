@@ -12,7 +12,7 @@
           <!-- 搜尋條件 -->
           
           
-          <v-col cols="3">
+          <v-col cols="4">
             <v-select
               v-model="searchForm.reportType"
               :items="reportTypeOptions"
@@ -24,7 +24,7 @@
               @update:model-value="handleReportTypeChange"
             />
           </v-col>
-          <v-col cols="3">
+          <v-col cols="4">
             <v-autocomplete
               v-model="searchForm.theme"
               :items="themeOptions"
@@ -38,7 +38,7 @@
               @update:model-value="handleThemeChange"
             />
           </v-col>
-          <v-col cols="3">
+          <v-col cols="4">
             <v-select
               v-model="searchForm.year"
               :items="yearOptions"
@@ -50,7 +50,10 @@
               @update:model-value="handleYearChange"
             />
           </v-col>
-          <v-col cols="3">
+          <v-col
+            cols="12"
+            class="d-flex justify-end"
+          >
             <v-btn
               color="purple-darken-2"
               :loading="isLoading"
@@ -204,55 +207,55 @@
                       {{ platform.platformName }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.JAN) }}
+                      {{ formatMonthValue(platform.budget.JAN) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.FEB) }}
+                      {{ formatMonthValue(platform.budget.FEB) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.MAR) }}
+                      {{ formatMonthValue(platform.budget.MAR) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.budget, 1)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.budget, 1)) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.APR) }}
+                      {{ formatMonthValue(platform.budget.APR) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.MAY) }}
+                      {{ formatMonthValue(platform.budget.MAY) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.JUN) }}
+                      {{ formatMonthValue(platform.budget.JUN) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.budget, 2)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.budget, 2)) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.JUL) }}
+                      {{ formatMonthValue(platform.budget.JUL) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.AUG) }}
+                      {{ formatMonthValue(platform.budget.AUG) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.SEP) }}
+                      {{ formatMonthValue(platform.budget.SEP) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.budget, 3)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.budget, 3)) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.OCT) }}
+                      {{ formatMonthValue(platform.budget.OCT) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.NOV) }}
+                      {{ formatMonthValue(platform.budget.NOV) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.budget.DEC) }}
+                      {{ formatMonthValue(platform.budget.DEC) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.budget, 4)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.budget, 4)) }}
                     </td>
                     <td class="total-col">
-                      {{ formatNumber(getPlatformTotal(platform.budget)) }}
+                      {{ formatMonthValue(getPlatformTotal(platform.budget)) }}
                     </td>
                   </tr>
                 </template>
@@ -263,55 +266,55 @@
                   月度總計
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('JAN')) }}
+                  {{ formatMonthValue(getMonthlyTotal('JAN')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('FEB')) }}
+                  {{ formatMonthValue(getMonthlyTotal('FEB')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('MAR')) }}
+                  {{ formatMonthValue(getMonthlyTotal('MAR')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(1)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(1)) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('APR')) }}
+                  {{ formatMonthValue(getMonthlyTotal('APR')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('MAY')) }}
+                  {{ formatMonthValue(getMonthlyTotal('MAY')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('JUN')) }}
+                  {{ formatMonthValue(getMonthlyTotal('JUN')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(2)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(2)) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('JUL')) }}
+                  {{ formatMonthValue(getMonthlyTotal('JUL')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('AUG')) }}
+                  {{ formatMonthValue(getMonthlyTotal('AUG')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('SEP')) }}
+                  {{ formatMonthValue(getMonthlyTotal('SEP')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(3)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(3)) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('OCT')) }}
+                  {{ formatMonthValue(getMonthlyTotal('OCT')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('NOV')) }}
+                  {{ formatMonthValue(getMonthlyTotal('NOV')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('DEC')) }}
+                  {{ formatMonthValue(getMonthlyTotal('DEC')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(4)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(4)) }}
                 </td>
                 <td class="total-col highlight-total">
-                  {{ formatNumber(getGrandTotal()) }}
+                  {{ formatMonthValue(getGrandTotal()) }}
                 </td>
               </tr>
             </tbody>
@@ -419,55 +422,55 @@
                       {{ platform.platformName }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.JAN) }}
+                      {{ formatMonthValue(platform.expense.JAN) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.FEB) }}
+                      {{ formatMonthValue(platform.expense.FEB) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.MAR) }}
+                      {{ formatMonthValue(platform.expense.MAR) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.expense, 1)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.expense, 1)) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.APR) }}
+                      {{ formatMonthValue(platform.expense.APR) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.MAY) }}
+                      {{ formatMonthValue(platform.expense.MAY) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.JUN) }}
+                      {{ formatMonthValue(platform.expense.JUN) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.expense, 2)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.expense, 2)) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.JUL) }}
+                      {{ formatMonthValue(platform.expense.JUL) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.AUG) }}
+                      {{ formatMonthValue(platform.expense.AUG) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.SEP) }}
+                      {{ formatMonthValue(platform.expense.SEP) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.expense, 3)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.expense, 3)) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.OCT) }}
+                      {{ formatMonthValue(platform.expense.OCT) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.NOV) }}
+                      {{ formatMonthValue(platform.expense.NOV) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense.DEC) }}
+                      {{ formatMonthValue(platform.expense.DEC) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getQuarterTotal(platform.expense, 4)) }}
+                      {{ formatQuarterValue(getQuarterTotal(platform.expense, 4)) }}
                     </td>
                     <td class="total-col">
-                      {{ formatNumber(getPlatformTotal(platform.expense)) }}
+                      {{ formatMonthValue(getPlatformTotal(platform.expense)) }}
                     </td>
                   </tr>
                 </template>
@@ -478,55 +481,55 @@
                   月度總計
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('JAN')) }}
+                  {{ formatMonthValue(getMonthlyTotal('JAN')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('FEB')) }}
+                  {{ formatMonthValue(getMonthlyTotal('FEB')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('MAR')) }}
+                  {{ formatMonthValue(getMonthlyTotal('MAR')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(1)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(1)) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('APR')) }}
+                  {{ formatMonthValue(getMonthlyTotal('APR')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('MAY')) }}
+                  {{ formatMonthValue(getMonthlyTotal('MAY')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('JUN')) }}
+                  {{ formatMonthValue(getMonthlyTotal('JUN')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(2)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(2)) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('JUL')) }}
+                  {{ formatMonthValue(getMonthlyTotal('JUL')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('AUG')) }}
+                  {{ formatMonthValue(getMonthlyTotal('AUG')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('SEP')) }}
+                  {{ formatMonthValue(getMonthlyTotal('SEP')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(3)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(3)) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('OCT')) }}
+                  {{ formatMonthValue(getMonthlyTotal('OCT')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('NOV')) }}
+                  {{ formatMonthValue(getMonthlyTotal('NOV')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyTotal('DEC')) }}
+                  {{ formatMonthValue(getMonthlyTotal('DEC')) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyTotal(4)) }}
+                  {{ formatQuarterValue(getQuarterlyTotal(4)) }}
                 </td>
                 <td class="total-col highlight-total">
-                  {{ formatNumber(getGrandTotal()) }}
+                  {{ formatMonthValue(getGrandTotal()) }}
                 </td>
               </tr>
             </tbody>
@@ -852,189 +855,189 @@
                     
                     <!-- JAN -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.JAN || 0) }}
+                      {{ formatMonthValue(platform.budget?.JAN || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.JAN || 0) }}
+                      {{ formatMonthValue(platform.expense?.JAN || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.JAN)">
-                      {{ formatNumber(platform.difference.JAN) }}
+                      {{ formatMonthValue(platform.difference.JAN) }}
                     </td>
 
                     <!-- FEB -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.FEB || 0) }}
+                      {{ formatMonthValue(platform.budget?.FEB || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.FEB || 0) }}
+                      {{ formatMonthValue(platform.expense?.FEB || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.FEB)">
-                      {{ formatNumber(platform.difference.FEB) }}
+                      {{ formatMonthValue(platform.difference.FEB) }}
                     </td>
 
                     <!-- MAR -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.MAR || 0) }}
+                      {{ formatMonthValue(platform.budget?.MAR || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.MAR || 0) }}
+                      {{ formatMonthValue(platform.expense?.MAR || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.MAR)">
-                      {{ formatNumber(platform.difference.MAR) }}
+                      {{ formatMonthValue(platform.difference.MAR) }}
                     </td>
 
                     <!-- Q1 -->
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyBudget(platform, 1)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyBudget(platform, 1)) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyExpense(platform, 1)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyExpense(platform, 1)) }}
                     </td>
                     <td :class="['quarter-col', getDifferenceClass(getPlatformQuarterlyDifference(platform, 1))]">
-                      {{ formatNumber(getPlatformQuarterlyDifference(platform, 1)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyDifference(platform, 1)) }}
                     </td>
 
                     <!-- APR -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.APR || 0) }}
+                      {{ formatMonthValue(platform.budget?.APR || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.APR || 0) }}
+                      {{ formatMonthValue(platform.expense?.APR || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.APR)">
-                      {{ formatNumber(platform.difference.APR) }}
+                      {{ formatMonthValue(platform.difference.APR) }}
                     </td>
 
                     <!-- MAY -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.MAY || 0) }}
+                      {{ formatMonthValue(platform.budget?.MAY || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.MAY || 0) }}
+                      {{ formatMonthValue(platform.expense?.MAY || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.MAY)">
-                      {{ formatNumber(platform.difference.MAY) }}
+                      {{ formatMonthValue(platform.difference.MAY) }}
                     </td>
 
                     <!-- JUN -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.JUN || 0) }}
+                      {{ formatMonthValue(platform.budget?.JUN || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.JUN || 0) }}
+                      {{ formatMonthValue(platform.expense?.JUN || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.JUN)">
-                      {{ formatNumber(platform.difference.JUN) }}
+                      {{ formatMonthValue(platform.difference.JUN) }}
                     </td>
 
                     <!-- Q2 -->
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyBudget(platform, 2)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyBudget(platform, 2)) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyExpense(platform, 2)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyExpense(platform, 2)) }}
                     </td>
                     <td :class="['quarter-col', getDifferenceClass(getPlatformQuarterlyDifference(platform, 2))]">
-                      {{ formatNumber(getPlatformQuarterlyDifference(platform, 2)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyDifference(platform, 2)) }}
                     </td>
 
                     <!-- JUL -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.JUL || 0) }}
+                      {{ formatMonthValue(platform.budget?.JUL || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.JUL || 0) }}
+                      {{ formatMonthValue(platform.expense?.JUL || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.JUL)">
-                      {{ formatNumber(platform.difference.JUL) }}
+                      {{ formatMonthValue(platform.difference.JUL) }}
                     </td>
 
                     <!-- AUG -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.AUG || 0) }}
+                      {{ formatMonthValue(platform.budget?.AUG || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.AUG || 0) }}
+                      {{ formatMonthValue(platform.expense?.AUG || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.AUG)">
-                      {{ formatNumber(platform.difference.AUG) }}
+                      {{ formatMonthValue(platform.difference.AUG) }}
                     </td>
 
                     <!-- SEP -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.SEP || 0) }}
+                      {{ formatMonthValue(platform.budget?.SEP || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.SEP || 0) }}
+                      {{ formatMonthValue(platform.expense?.SEP || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.SEP)">
-                      {{ formatNumber(platform.difference.SEP) }}
+                      {{ formatMonthValue(platform.difference.SEP) }}
                     </td>
 
                     <!-- Q3 -->
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyBudget(platform, 3)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyBudget(platform, 3)) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyExpense(platform, 3)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyExpense(platform, 3)) }}
                     </td>
                     <td :class="['quarter-col', getDifferenceClass(getPlatformQuarterlyDifference(platform, 3))]">
-                      {{ formatNumber(getPlatformQuarterlyDifference(platform, 3)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyDifference(platform, 3)) }}
                     </td>
 
                     <!-- OCT -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.OCT || 0) }}
+                      {{ formatMonthValue(platform.budget?.OCT || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.OCT || 0) }}
+                      {{ formatMonthValue(platform.expense?.OCT || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.OCT)">
-                      {{ formatNumber(platform.difference.OCT) }}
+                      {{ formatMonthValue(platform.difference.OCT) }}
                     </td>
 
                     <!-- NOV -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.NOV || 0) }}
+                      {{ formatMonthValue(platform.budget?.NOV || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.NOV || 0) }}
+                      {{ formatMonthValue(platform.expense?.NOV || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.NOV)">
-                      {{ formatNumber(platform.difference.NOV) }}
+                      {{ formatMonthValue(platform.difference.NOV) }}
                     </td>
 
                     <!-- DEC -->
                     <td class="month-col">
-                      {{ formatNumber(platform.budget?.DEC || 0) }}
+                      {{ formatMonthValue(platform.budget?.DEC || 0) }}
                     </td>
                     <td class="month-col">
-                      {{ formatNumber(platform.expense?.DEC || 0) }}
+                      {{ formatMonthValue(platform.expense?.DEC || 0) }}
                     </td>
                     <td :class="getDifferenceClass(platform.difference.DEC)">
-                      {{ formatNumber(platform.difference.DEC) }}
+                      {{ formatMonthValue(platform.difference.DEC) }}
                     </td>
 
                     <!-- Q4 -->
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyBudget(platform, 4)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyBudget(platform, 4)) }}
                     </td>
                     <td class="quarter-col">
-                      {{ formatNumber(getPlatformQuarterlyExpense(platform, 4)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyExpense(platform, 4)) }}
                     </td>
                     <td :class="['quarter-col', getDifferenceClass(getPlatformQuarterlyDifference(platform, 4))]">
-                      {{ formatNumber(getPlatformQuarterlyDifference(platform, 4)) }}
+                      {{ formatQuarterValue(getPlatformQuarterlyDifference(platform, 4)) }}
                     </td>
 
                     <!-- Total -->
                     <td class="total-col">
-                      {{ formatNumber(getPlatformBudgetTotal(platform.budget)) }}
+                      {{ formatMonthValue(getPlatformBudgetTotal(platform.budget)) }}
                     </td>
                     <td class="total-col">
-                      {{ formatNumber(getPlatformExpenseTotal(platform.expense)) }}
+                      {{ formatMonthValue(getPlatformExpenseTotal(platform.expense)) }}
                     </td>
                     <td :class="['total-col', getDifferenceClass(getPlatformDifference(platform))]">
-                      {{ formatNumber(getPlatformDifference(platform)) }}
+                      {{ formatMonthValue(getPlatformDifference(platform)) }}
                     </td>
                   </tr>
                 </template>
@@ -1050,173 +1053,173 @@
                 </td>
                 <!-- JAN -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('JAN')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('JAN')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('JAN')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('JAN')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('JAN'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('JAN')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('JAN')) }}
                 </td>
                 <!-- FEB -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('FEB')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('FEB')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('FEB')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('FEB')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('FEB'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('FEB')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('FEB')) }}
                 </td>
                 <!-- MAR -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('MAR')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('MAR')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('MAR')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('MAR')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('MAR'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('MAR')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('MAR')) }}
                 </td>
                 <!-- Q1 -->
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyBudgetTotal(1)) }}
+                  {{ formatQuarterValue(getQuarterlyBudgetTotal(1)) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyExpenseTotal(1)) }}
+                  {{ formatQuarterValue(getQuarterlyExpenseTotal(1)) }}
                 </td>
                 <td :class="['quarter-col', getDifferenceClass(getQuarterlyDifferenceTotal(1))]">
-                  {{ formatNumber(getQuarterlyDifferenceTotal(1)) }}
+                  {{ formatQuarterValue(getQuarterlyDifferenceTotal(1)) }}
                 </td>
                 <!-- APR -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('APR')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('APR')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('APR')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('APR')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('APR'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('APR')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('APR')) }}
                 </td>
                 <!-- MAY -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('MAY')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('MAY')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('MAY')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('MAY')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('MAY'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('MAY')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('MAY')) }}
                 </td>
                 <!-- JUN -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('JUN')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('JUN')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('JUN')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('JUN')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('JUN'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('JUN')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('JUN')) }}
                 </td>
                 <!-- Q2 -->
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyBudgetTotal(2)) }}
+                  {{ formatQuarterValue(getQuarterlyBudgetTotal(2)) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyExpenseTotal(2)) }}
+                  {{ formatQuarterValue(getQuarterlyExpenseTotal(2)) }}
                 </td>
                 <td :class="['quarter-col', getDifferenceClass(getQuarterlyDifferenceTotal(2))]">
-                  {{ formatNumber(getQuarterlyDifferenceTotal(2)) }}
+                  {{ formatQuarterValue(getQuarterlyDifferenceTotal(2)) }}
                 </td>
                 <!-- JUL -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('JUL')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('JUL')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('JUL')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('JUL')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('JUL'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('JUL')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('JUL')) }}
                 </td>
                 <!-- AUG -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('AUG')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('AUG')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('AUG')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('AUG')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('AUG'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('AUG')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('AUG')) }}
                 </td>
                 <!-- SEP -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('SEP')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('SEP')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('SEP')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('SEP')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('SEP'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('SEP')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('SEP')) }}
                 </td>
                 <!-- Q3 -->
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyBudgetTotal(3)) }}
+                  {{ formatQuarterValue(getQuarterlyBudgetTotal(3)) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyExpenseTotal(3)) }}
+                  {{ formatQuarterValue(getQuarterlyExpenseTotal(3)) }}
                 </td>
                 <td :class="['quarter-col', getDifferenceClass(getQuarterlyDifferenceTotal(3))]">
-                  {{ formatNumber(getQuarterlyDifferenceTotal(3)) }}
+                  {{ formatQuarterValue(getQuarterlyDifferenceTotal(3)) }}
                 </td>
                 <!-- OCT -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('OCT')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('OCT')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('OCT')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('OCT')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('OCT'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('OCT')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('OCT')) }}
                 </td>
                 <!-- NOV -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('NOV')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('NOV')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('NOV')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('NOV')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('NOV'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('NOV')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('NOV')) }}
                 </td>
                 <!-- DEC -->
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyBudgetTotal('DEC')) }}
+                  {{ formatMonthValue(getMonthlyBudgetTotal('DEC')) }}
                 </td>
                 <td class="month-col">
-                  {{ formatNumber(getMonthlyExpenseTotal('DEC')) }}
+                  {{ formatMonthValue(getMonthlyExpenseTotal('DEC')) }}
                 </td>
                 <td :class="getDifferenceClass(getMonthlyDifferenceTotal('DEC'))">
-                  {{ formatNumber(getMonthlyDifferenceTotal('DEC')) }}
+                  {{ formatMonthValue(getMonthlyDifferenceTotal('DEC')) }}
                 </td>
                 <!-- Q4 -->
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyBudgetTotal(4)) }}
+                  {{ formatQuarterValue(getQuarterlyBudgetTotal(4)) }}
                 </td>
                 <td class="quarter-col">
-                  {{ formatNumber(getQuarterlyExpenseTotal(4)) }}
+                  {{ formatQuarterValue(getQuarterlyExpenseTotal(4)) }}
                 </td>
                 <td :class="['quarter-col', getDifferenceClass(getQuarterlyDifferenceTotal(4))]">
-                  {{ formatNumber(getQuarterlyDifferenceTotal(4)) }}
+                  {{ formatQuarterValue(getQuarterlyDifferenceTotal(4)) }}
                 </td>
                 <!-- Total -->
                 <td class="total-col highlight-total">
-                  {{ formatNumber(getGrandBudgetTotal()) }}
+                  {{ formatMonthValue(getGrandBudgetTotal()) }}
                 </td>
                 <td class="total-col highlight-total">
-                  {{ formatNumber(getGrandExpenseTotal()) }}
+                  {{ formatMonthValue(getGrandExpenseTotal()) }}
                 </td>
                 <td :class="['total-col', 'highlight-total', getDifferenceClass(getGrandDifferenceTotal())]">
-                  {{ formatNumber(getGrandDifferenceTotal()) }}
+                  {{ formatMonthValue(getGrandDifferenceTotal()) }}
                 </td>
               </tr>
             </tbody>
@@ -1233,7 +1236,6 @@ import { useApi } from '@/composables/axios'
 import { useSnackbar } from 'vuetify-use-dialog'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
-import { formatNumber } from '@/utils/format'
 import { definePage } from 'vue-router/auto'
 import UserRole from '@/enums/UserRole'
 import html2pdf from 'html2pdf.js'
@@ -1275,7 +1277,8 @@ const themeOptions = ref([])
 const reportTypeOptions = ref([
   { title: '行銷預算表', value: 'budget' },
   { title: '行銷實際花費表', value: 'expense' },
-  { title: '行銷預算與實際花費比較表', value: 'comparison' }
+  { title: '行銷預算與實際花費比較表', value: 'comparison' },
+  { title: '行銷各線實際花費表'}
 ])
 
 // ===== 報表資料 =====
@@ -1388,18 +1391,17 @@ const handleReportTypeChange = () => {
 const generateReport = async () => {
   try {
     // 驗證
+    if (!searchForm.value.reportType) {
+      reportTypeError.value = '請選擇報表類型'
+    }
+    if (!searchForm.value.theme) {
+      themeError.value = '請選擇行銷主題'
+    }
     if (!searchForm.value.year) {
       yearError.value = '請選擇年度'
       return
     }
-    if (!searchForm.value.theme) {
-      themeError.value = '請選擇行銷主題'
-      return
-    }
-    if (!searchForm.value.reportType) {
-      reportTypeError.value = '請選擇報表類型'
-      return
-    }
+    
 
     isLoading.value = true
     let result
@@ -1470,7 +1472,7 @@ const generateReport = async () => {
 // 處理實際花費資料
 const processExpenseData = (expenses) => {
   const channelMap = new Map()
-
+  
   // 遍歷所有費用記錄
   expenses.forEach(expense => {
     const channelId = expense.channel._id
@@ -1512,6 +1514,22 @@ const processExpenseData = (expenses) => {
   }))
 }
 
+// 格式化月份數值
+const formatMonthValue = (value) => {
+  if (value === null || value === undefined || value === '' || value === 0) {
+    return ''
+  }
+  return value.toLocaleString('en-US')
+}
+
+// 格式化季度數值
+const formatQuarterValue = (value) => {
+  if (value === null || value === undefined || value === '' || value === 0) {
+    return '-'
+  }
+  return value.toLocaleString('en-US')
+}
+
 // 計算季度總額
 const getQuarterTotal = (budget, quarter) => {
   const quarterMap = {
@@ -1520,8 +1538,9 @@ const getQuarterTotal = (budget, quarter) => {
     3: ['JUL', 'AUG', 'SEP'],
     4: ['OCT', 'NOV', 'DEC']
   }
-  
-  return quarterMap[quarter].reduce((sum, month) => sum + (budget[month] || 0), 0)
+
+  const total = quarterMap[quarter].reduce((sum, month) => sum + (budget[month] || 0), 0)
+  return formatQuarterValue(total)
 }
 
 // 計算平台總額
@@ -1531,19 +1550,21 @@ const getPlatformTotal = (budget) => {
 
 // 計算月度總額
 const getMonthlyTotal = (month) => {
+  let total = 0
   if (searchForm.value.reportType === 'expense') {
-    return reportData.value.reduce((sum, channel) => {
+    total = reportData.value.reduce((sum, channel) => {
       return sum + channel.platforms.reduce((platformSum, platform) => {
         return platformSum + (platform.expense[month] || 0)
       }, 0)
     }, 0)
-  }
-  // 原有的預算表計算邏輯
-  return reportData.value.reduce((sum, channel) => {
-    return sum + channel.platforms.reduce((platformSum, platform) => {
-      return platformSum + (platform.budget[month] || 0)
+  } else {
+    total = reportData.value.reduce((sum, channel) => {
+      return sum + channel.platforms.reduce((platformSum, platform) => {
+        return platformSum + (platform.budget[month] || 0)
+      }, 0)
     }, 0)
-  }, 0)
+  }
+  return formatMonthValue(total)
 }
 
 // 計算季度總額
@@ -1555,7 +1576,12 @@ const getQuarterlyTotal = (quarter) => {
     4: ['OCT', 'NOV', 'DEC']
   }
 
-  return monthMap[quarter].reduce((sum, month) => sum + getMonthlyTotal(month), 0)
+  const total = monthMap[quarter].reduce((sum, month) => {
+    const monthTotal = getMonthlyTotal(month)
+    return sum + (monthTotal === '' ? 0 : parseFloat(monthTotal.replace(/,/g, '')))
+  }, 0)
+  
+  return formatQuarterValue(total)
 }
 
 // 計算總額
@@ -1896,7 +1922,7 @@ const exportToPDF = async () => {
 
     // 創建一個臨時容器
     const container = document.createElement('div')
-    container.style.width = '2250px'
+    container.style.width = '2200px'
     container.style.backgroundColor = 'white'
     container.style.padding = '20px'
     container.style.boxSizing = 'border-box'

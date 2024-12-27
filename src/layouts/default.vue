@@ -314,7 +314,8 @@
                     cols="12"
                     class="ps-4 pb-0 pt-0"
                   >
-                    {{ user.userId }}
+                    <span>{{ user.userId }}</span>
+                    <span v-if="user.isAdmin">{{ user.adminId }}</span>
                   </v-col>
                   <v-col
                     cols="12"

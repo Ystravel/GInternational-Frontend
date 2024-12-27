@@ -218,8 +218,7 @@
               <!-- 年度和主題選擇 -->
               <v-row class="mb-6">
                 <v-col
-                  cols="12"
-                  sm="4"
+                  cols="3"
                 >
                   <v-select
                     v-model="year.value.value"
@@ -231,8 +230,7 @@
                   />
                 </v-col>
                 <v-col
-                  cols="12"
-                  sm="4"
+                  cols="3"
                 >
                   <v-autocomplete
                     v-model="theme.value.value"
@@ -246,10 +244,7 @@
                     clearable
                   />
                 </v-col>
-                <v-col 
-                  cols="12"
-                  sm="4"
-                >
+                <v-col>
                   <v-textarea
                     v-model="note.value.value"
                     :error-messages="note.errorMessage.value"
@@ -1165,18 +1160,18 @@ const submit = handleSubmit(async (values) => {
         channel: channel.channelId,
         platform: platform.platformId,
         monthlyBudget: {
-          JAN: Number(platform.budget.JAN) || 0,
-          FEB: Number(platform.budget.FEB) || 0,
-          MAR: Number(platform.budget.MAR) || 0,
-          APR: Number(platform.budget.APR) || 0,
-          MAY: Number(platform.budget.MAY) || 0,
-          JUN: Number(platform.budget.JUN) || 0,
-          JUL: Number(platform.budget.JUL) || 0,
-          AUG: Number(platform.budget.AUG) || 0,
-          SEP: Number(platform.budget.SEP) || 0,
-          OCT: Number(platform.budget.OCT) || 0,
-          NOV: Number(platform.budget.NOV) || 0,
-          DEC: Number(platform.budget.DEC) || 0
+          JAN: platform.budget.JAN === '' ? '' : Number(platform.budget.JAN),
+          FEB: platform.budget.FEB === '' ? '' : Number(platform.budget.FEB),
+          MAR: platform.budget.MAR === '' ? '' : Number(platform.budget.MAR),
+          APR: platform.budget.APR === '' ? '' : Number(platform.budget.APR),
+          MAY: platform.budget.MAY === '' ? '' : Number(platform.budget.MAY),
+          JUN: platform.budget.JUN === '' ? '' : Number(platform.budget.JUN),
+          JUL: platform.budget.JUL === '' ? '' : Number(platform.budget.JUL),
+          AUG: platform.budget.AUG === '' ? '' : Number(platform.budget.AUG),
+          SEP: platform.budget.SEP === '' ? '' : Number(platform.budget.SEP),
+          OCT: platform.budget.OCT === '' ? '' : Number(platform.budget.OCT),
+          NOV: platform.budget.NOV === '' ? '' : Number(platform.budget.NOV),
+          DEC: platform.budget.DEC === '' ? '' : Number(platform.budget.DEC)
         }
       }))
     )

@@ -20,10 +20,9 @@ export const formatDate = (date) => {
  * @param {number} number - 要格式化的數字
  * @returns {string} 格式化後的數字字串
  */
-export const formatNumber = (number) => {
-  if (number === null || number === undefined || isNaN(number)) return ''
-  return number.toLocaleString('zh-TW', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
+export const formatNumber = (value) => {
+  if (value === null || value === undefined || value === '' || value === 0) {
+    return '-'
+  }
+  return value.toLocaleString('en-US')
 } 

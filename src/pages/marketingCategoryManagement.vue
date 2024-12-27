@@ -77,8 +77,15 @@
                   <v-list-item
                     v-for="item in marketingThemes"
                     :key="item._id"
-                    :title="item.name"
                   >
+                    <template #prepend>
+                      <div class="order-number">
+                        {{ item.order }}
+                      </div>
+                    </template>
+                    <v-list-item-title class="ms-2">
+                      {{ item.name }}
+                    </v-list-item-title>
                     <template #append>
                       <v-btn
                         v-tooltip:start="'編輯行銷主題'"
@@ -144,8 +151,15 @@
                   <v-list-item
                     v-for="item in advertisingChannels"
                     :key="item._id"
-                    :title="item.name"
                   >
+                    <template #prepend>
+                      <div class="order-number">
+                        {{ item.order }}
+                      </div>
+                    </template>
+                    <v-list-item-title class="ms-2">
+                      {{ item.name }}
+                    </v-list-item-title>
                     <template #append>
                       <v-btn
                         v-tooltip:start="'編輯廣告渠道'"
@@ -211,8 +225,15 @@
                   <v-list-item
                     v-for="item in platforms"
                     :key="item._id"
-                    :title="item.name"
                   >
+                    <template #prepend>
+                      <div class="order-number">
+                        {{ item.order }}
+                      </div>
+                    </template>
+                    <v-list-item-title class="ms-2">
+                      {{ item.name }}
+                    </v-list-item-title>
                     <template #append>
                       <v-btn
                         v-tooltip:start="'編輯平台'"
@@ -278,8 +299,15 @@
                   <v-list-item
                     v-for="item in details"
                     :key="item._id"
-                    :title="item.name"
                   >
+                    <template #prepend>
+                      <div class="order-number">
+                        {{ item.order }}
+                      </div>
+                    </template>
+                    <v-list-item-title class="ms-2">
+                      {{ item.name }}
+                    </v-list-item-title>
                     <template #append>
                       <v-btn
                         v-tooltip:start="'編輯線別'"
@@ -330,8 +358,8 @@
         :disabled="isSubmitting"
         @submit.prevent="submit"
       >
-        <v-card class="rounded-lg px-4 py-6">
-          <div class="card-title px-4 py-3">
+        <v-card class="rounded-lg px-4 pt-7 pb-6">
+          <div class="card-title px-4 pb-2">
             {{ dialog.id ? '編輯分類' : getDialogTitle }}
           </div>
 
@@ -346,6 +374,20 @@
                   variant="outlined"
                   density="compact"
                   clearable
+                />
+              </v-col>
+              <v-col 
+                v-if="dialog.id"
+                cols="12"
+              >
+                <v-text-field
+                  v-model="order.value.value"
+                  :error-messages="order.errorMessage.value"
+                  label="*排序"
+                  variant="outlined"
+                  density="compact"
+                  hint="輸入想要的順序位置，其他項目會自動調整"
+                  persistent-hint
                 />
               </v-col>
             </v-row>
@@ -424,11 +466,11 @@ definePage({
   meta: {
     title: '行銷分類管理 | GInternational',
     login: true,
-    roles: [UserRole.ADMIN, UserRole.USER, UserRole.MANAGER]
+    roles: [UserRole.ADMIN, UserRole.MANAGER]
   }
 })
 
-// ===== API 與 Store 初始化 =====
+// ===== API 與 Store 始化 =====
 const { apiAuth } = useApi()
 const user = useUserStore()
 const createSnackbar = useSnackbar()
@@ -445,16 +487,19 @@ const isSubmitting = ref(false)
 
 // ===== 表單驗證架構 =====
 const schema = yup.object({
-  name: yup.string().required('請輸入名稱')
+  name: yup.string().required('請輸入名稱'),
+  order: yup.string().required('請輸入排序').min(1, '排序必須大於0')
 })
 
 // ===== 表單初始化 =====
 const { handleSubmit, resetForm } = useForm({
-  validationSchema: schema
+  validationSchema: schema,
+  validateOnMount: false
 })
 
 // ===== 表單欄位 =====
 const name = useField('name')
+const order = useField('order')
 
 // ===== 對話框設定 =====
 const dialog = ref({
@@ -482,7 +527,8 @@ const getDialogTitle = computed(() => {
 const hasChanges = computed(() => {
   if (!dialog.value.id) return true
   if (!originalData.value) return false
-  return originalData.value.name !== name.value.value
+  return originalData.value.name !== name.value.value ||
+         originalData.value.order !== parseInt(order.value.value)
 })
 
 // ===== 搜尋相關設定 =====
@@ -511,7 +557,7 @@ watch(quickSearchText, () => {
 const loadData = async (type = null) => {
   try {
     isLoading.value = true
-    // 如果指定了類型，只加載該類型的數據
+    // 如果定了類型，只加載該類型的數據
     if (type !== null) {
       const params = {
         [`page${type}`]: pages.value[type]
@@ -578,13 +624,27 @@ const loadData = async (type = null) => {
   }
 }
 
-const openDialog = (type) => {
-  dialog.value = {
-    open: true,
-    id: '',
-    type
+const openDialog = async (type) => {
+  try {
+    dialog.value = {
+      open: true,
+      id: '',
+      type
+    }
+    resetForm()
+
+    // 新增時自動取得最大順序值
+    if (!dialog.value.id) {
+      const { data } = await apiAuth.get('/marketing/categories/maxOrder', {
+        params: { type }
+      })
+      if (data.success) {
+        order.value.value = data.result
+      }
+    }
+  } catch (error) {
+    handleError(error)
   }
-  resetForm()
 }
 
 const editItem = (item) => {
@@ -596,9 +656,9 @@ const editItem = (item) => {
     }
     
     name.value.value = item.name || ''
+    order.value.value = item.order || 1
     originalData.value = { ...item }
     
-    // 最後才更新 dialog，避免觸發不必要的渲染
     dialog.value = {
       open: true,
       id: item._id,
@@ -633,6 +693,11 @@ const submit = handleSubmit(async (values) => {
     const submitData = {
       name: values.name,
       type: dialog.value.type
+    }
+
+    // 如果是編輯模式，加入排序值
+    if (dialog.value.id && values.order) {
+      submitData.order = parseInt(values.order)
     }
 
     if (dialog.value.id) {
@@ -752,6 +817,18 @@ const handlePageChange = (type, newPage) => {
         color: white;
       }
     }
+  }
+  .order-number {
+    min-width: 16px;
+    height: 16px;
+    border-radius: 12px;
+    background-color: #8E24AA;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    margin-right: 8px;
   }
 }
 </style>

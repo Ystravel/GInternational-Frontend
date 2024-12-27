@@ -502,7 +502,8 @@ const fieldTranslations = {
   platform: '平台',
   detail: '線別',
   relatedBudget: '關聯預算表',
-  year: '年度'
+  year: '年度',
+  order: '排序'
 }
 
 // 行銷分類類型對應
