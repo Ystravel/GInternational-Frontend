@@ -493,7 +493,7 @@ const fieldTranslations = {
   note: '備註',
   isActive: '啟用狀態',
   employmentStatus: '任職狀態',
-  marketingExpenses: '實際花費',
+  marketingExpenses: '實際支出',
   marketingBudgets: '行銷預算',
   expense: '花費金額',
   invoiceDate: '發票日期',

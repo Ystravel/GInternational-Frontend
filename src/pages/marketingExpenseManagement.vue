@@ -137,7 +137,7 @@
             class="ps-3 pb-6 d-flex align-center"
           >
             <h3 class="d-inline">
-              實際花費管理
+              實際支出管理
             </h3>
           </v-col>
 
@@ -150,7 +150,7 @@
                 prepend-icon="mdi-plus"
                 @click="openDialog()"
               >
-                新增實際花費
+                新增實際支出
               </v-btn>
               <div
                 style="width: 260px;"
@@ -253,7 +253,7 @@
             @submit.prevent="submit"
           >
             <div class="card-title px-8 py-3">
-              {{ dialog.id ? '編輯實際花費' : '新增實際花費' }}
+              {{ dialog.id ? '編輯實際支出' : '新增實際支出' }}
             </div>
 
             <v-card-text class="mt-2 mb-4 pa-3">
@@ -560,8 +560,8 @@
     <!-- 確認刪除對話框 -->
     <ConfirmDeleteDialogWithTextField
       v-model="confirmDeleteDialog"
-      title="確認刪除實際花費"
-      :message="`確定要刪除「<span class='text-pink-lighten-1' style='font-weight: 800;'>${formatDate(originalData?.invoiceDate)}${originalData?.theme?.name}</span>」的實際花費嗎？ 此操作無法復原。`"
+      title="確認刪除實際支出"
+      :message="`確定要刪除「<span class='text-pink-lighten-1' style='font-weight: 800;'>${formatDate(originalData?.invoiceDate)}${originalData?.theme?.name}</span>」的實際支出嗎？ 此操作無法復原。`"
       :expected-name="`${formatDate(originalData?.invoiceDate)}${originalData?.theme?.name}`"
       input-label="發票日期及行銷主題"
       @confirm="deleteExpense"
@@ -676,7 +676,7 @@ const formatToDate = (dateString) => {
 // ===== 頁面設定 =====
 definePage({
   meta: {
-    title: '實際花費管理 | GInternational',
+    title: '實際支出管理 | GInternational',
     login: true,
     roles: [UserRole.ADMIN, UserRole.USER, UserRole.MANAGER]
   }
@@ -1121,13 +1121,13 @@ const submit = handleSubmit(async (values) => {
     if (dialog.value.id) {
       await apiAuth.patch(`/marketing/expenses/${dialog.value.id}`, submitData)
       createSnackbar({
-        text: '實際花費更新成功',
+        text: '實際支出更新成功',
         snackbarProps: { color: 'teal-lighten-1' }
       })
     } else {
       await apiAuth.post('/marketing/expenses', submitData)
       createSnackbar({
-        text: '實際花費新增成功',
+        text: '實際支出新增成功',
         snackbarProps: { color: 'teal-lighten-1' }
       })
     }
@@ -1147,7 +1147,7 @@ const deleteExpense = async () => {
   try {
     await apiAuth.delete(`/marketing/expenses/${dialog.value.id}`)
     createSnackbar({
-      text: '實際花費刪除成功',
+      text: '實際支出刪除成功',
       snackbarProps: { color: 'teal-lighten-1' }
     })
     closeDialog()

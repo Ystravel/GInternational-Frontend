@@ -94,7 +94,7 @@
           </div>
         </div>
 
-        <!-- 行銷預算與實際花費比較表，因要滑動時，標題會被蓋住，所以需要獨立出來 -->
+        <!-- 行銷預算與實際支出比較表，因要滑動時，標題會被蓋住，所以需要獨立出來 -->
         <div
           v-if="searchForm.reportType === 'comparison'"
           class="budget-table-title"
@@ -320,7 +320,7 @@
             </tbody>
           </table>
 
-          <!-- 行銷實際花費表 -->
+          <!-- 行銷實際支出表 -->
           <div
             v-if="searchForm.reportType === 'expense'"
             class="budget-table-title "
@@ -535,7 +535,7 @@
             </tbody>
           </table>
 
-          <!-- 行銷預算與實際花費比較表 -->
+          <!-- 行銷預算與實際支出比較表 -->
           
 
           <table
@@ -1276,9 +1276,9 @@ const yearOptions = ref([])
 const themeOptions = ref([])
 const reportTypeOptions = ref([
   { title: '行銷預算表', value: 'budget' },
-  { title: '行銷實際花費表', value: 'expense' },
-  { title: '行銷預算與實際花費比較表', value: 'comparison' },
-  { title: '行銷各線實際花費表'}
+  { title: '行銷實際支出表', value: 'expense' },
+  { title: '行銷預算與實際支出比較表', value: 'comparison' },
+  { title: '行銷各線實際支出表'}
 ])
 
 // ===== 報表資料 =====
@@ -1342,6 +1342,13 @@ watch([
             if (!commonYears.includes(searchForm.value.year)) {
               searchForm.value.year = null
             }
+            // 檢查是否有共同年份
+            if (commonYears.length === 0) {
+              createSnackbar({
+                text: `「${getThemeName(newTheme)}」尚無預算與支出的對應資料`,
+                snackbarProps: { color: 'warning' }
+              })
+            }
           }
         } catch (error) {
           handleError(error)
@@ -1358,6 +1365,16 @@ watch([
         // 如果當前選擇的年度不在新的選項中，清空年度選擇
         if (!data.result.includes(searchForm.value.year)) {
           searchForm.value.year = null
+        }
+        // 檢查是否有年份資料
+        if (data.result.length === 0) {
+          const reportTypeName = reportTypeOptions.value.find(option => 
+            option.value === newReportType
+          )?.title || ''
+          createSnackbar({
+            text: `「${getThemeName(newTheme)}」尚無「${reportTypeName}」相關資料`,
+            snackbarProps: { color: 'warning' }
+          })
         }
       }
     }
@@ -1438,7 +1455,7 @@ const generateReport = async () => {
         try {
           // 取得預算資料
           const budgetResponse = await apiAuth.get(`/marketing/budgets/${searchForm.value.year}/${searchForm.value.theme}`)
-          // 取得實際花費資料
+          // 取得實際支出資料
           const expenseResponse = await apiAuth.get('/marketing/expenses/monthly-stats', {
             params: {
               year: searchForm.value.year,
@@ -1469,7 +1486,7 @@ const generateReport = async () => {
   }
 }
 
-// 處理實際花費資料
+// 處理實際支出資料
 const processExpenseData = (expenses) => {
   const channelMap = new Map()
   
@@ -1676,12 +1693,12 @@ const exportToExcel = async () => {
         { s: { r: 2, c: 50 }, e: { r: 2, c: 52 } }  // Total
       ]
     } else {
-      // 預算表或實際花費表的表頭
+      // 預算表或實際支出表的表頭
       XLSX.utils.sheet_add_aoa(ws, [
         ['廣告渠道', '平台', 'JAN', 'FEB', 'MAR', 'Q1', 'APR', 'MAY', 'JUN', 'Q2', 'JUL', 'AUG', 'SEP', 'Q3', 'OCT', 'NOV', 'DEC', 'Q4', 'Total']
       ], { origin: 'A3' })
 
-      // 預算表和實際花費表的欄寬
+      // 預算表和實際支出表的欄寬
       ws['!cols'] = [
         { wch: 15 },  // 廣告渠道
         { wch: 15 },  // 平台
@@ -1704,7 +1721,7 @@ const exportToExcel = async () => {
         { wch: 15 }   // Total
       ]
 
-      // 預算表和實際花費表的標題合併儲存格
+      // 預算表和實際支出表的標題合併儲存格
       ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 18 } }]
     }
 
@@ -1922,7 +1939,8 @@ const exportToPDF = async () => {
 
     // 創建一個臨時容器
     const container = document.createElement('div')
-    container.style.width = '2200px'
+    // 根據報表類型設定不同的寬度
+    container.style.width = searchForm.value.reportType === 'comparison' ? '5200px' : '2200px'
     container.style.backgroundColor = 'white'
     container.style.padding = '20px'
     container.style.boxSizing = 'border-box'
@@ -1953,6 +1971,46 @@ const exportToPDF = async () => {
     tableClone.style.tableLayout = 'fixed'
 
     // 調整表格內部樣式
+    if (searchForm.value.reportType === 'comparison') {
+      // 特別處理比較表的表頭
+      const thead = tableClone.querySelector('thead')
+      const firstRow = thead.querySelector('tr:first-child')
+      const secondRow = thead.querySelector('tr:last-child')
+      
+      // 確保第一行的廣告渠道和平台欄位正確顯示
+      const channelHeader = firstRow.querySelector('th:first-child')
+      const platformHeader = firstRow.querySelector('th:nth-child(2)')
+      
+      if (channelHeader && platformHeader) {
+        channelHeader.setAttribute('rowspan', '2')
+        platformHeader.setAttribute('rowspan', '2')
+        channelHeader.style.backgroundColor = '#607D8B'
+        platformHeader.style.backgroundColor = '#607D8B'
+        channelHeader.style.position = 'relative'
+        platformHeader.style.position = 'relative'
+        channelHeader.style.zIndex = '2'
+        platformHeader.style.zIndex = '2'
+        channelHeader.style.verticalAlign = 'middle'
+        platformHeader.style.verticalAlign = 'middle'
+        channelHeader.style.height = '86px'
+        platformHeader.style.height = '86px'
+      }
+
+      // 調整所有 sub-header-cell 的樣式
+      const subHeaderCells = secondRow.querySelectorAll('.sub-header-cell, .sub-header-cell-quarter')
+      subHeaderCells.forEach(cell => {
+        cell.style.backgroundColor = cell.classList.contains('sub-header-cell-quarter') ? '#00ACC1' : '#607D8B'
+        cell.style.color = 'white'
+        cell.style.padding = '8px'
+        cell.style.fontSize = '12px'
+        cell.style.fontWeight = '600'
+        cell.style.whiteSpace = 'nowrap'
+        cell.style.borderRight = '1px solid rgba(255, 255, 255, 0.3)'
+        cell.style.borderBottom = '1px solid #666'
+        cell.style.minWidth = '80px'
+      })
+    }
+
     const headerCells = tableClone.querySelectorAll('thead th')
     headerCells.forEach(cell => {
       cell.style.backgroundColor = '#607D8B'
@@ -2090,6 +2148,7 @@ const exportToPDF = async () => {
   }
 }
 
+
 // 錯誤處理
 const handleError = (error) => {
   console.error('Error:', error)
@@ -2139,7 +2198,7 @@ const processBudgetData = (data) => {
   return Object.values(channelGroups)
 }
 
-// 處理預算與實際花費比較資料
+// 處理預算與實際支出比較資料
 const processComparisonData = (budgetData, expenseData) => {
   const channelMap = new Map()
 
@@ -2166,7 +2225,7 @@ const processComparisonData = (budgetData, expenseData) => {
     })
   })
 
-  // 處理實際花費資料
+  // 處理實際支出資料
   expenseData.forEach(channel => {
     if (!channelMap.has(channel.channelName)) {
       channelMap.set(channel.channelName, {
@@ -2234,7 +2293,7 @@ const getMonthlyBudgetTotal = (month) => {
   }, 0)
 }
 
-// 計算月度實際花費總額
+// 計算月度實際支出總額
 const getMonthlyExpenseTotal = (month) => {
   return reportData.value.reduce((sum, channel) => {
     return sum + channel.platforms.reduce((platformSum, platform) => {
@@ -2260,7 +2319,7 @@ const getQuarterlyBudgetTotal = (quarter) => {
   return months.reduce((sum, month) => sum + getMonthlyBudgetTotal(month), 0)
 }
 
-// 計算季度實際花費總額
+// 計算季度實際支出總額
 const getQuarterlyExpenseTotal = (quarter) => {
   const months = {
     1: ['JAN', 'FEB', 'MAR'],
@@ -2283,7 +2342,7 @@ const getPlatformBudgetTotal = (budget) => {
   return Object.values(budget).reduce((sum, value) => sum + (value || 0), 0)
 }
 
-// 計算平台總實際花費
+// 計算平台總實際支出
 const getPlatformExpenseTotal = (expense) => {
   if (!expense) return 0
   return Object.values(expense).reduce((sum, value) => sum + (value || 0), 0)
@@ -2303,7 +2362,7 @@ const getGrandBudgetTotal = () => {
   }, 0)
 }
 
-// 計算年度總實際花費
+// 計算年度總實際支出
 const getGrandExpenseTotal = () => {
   return reportData.value.reduce((sum, channel) => {
     return sum + channel.platforms.reduce((platformSum, platform) => {
@@ -2329,7 +2388,7 @@ const getPlatformQuarterlyBudget = (platform, quarter) => {
   return months.reduce((sum, month) => sum + (platform.budget?.[month] || 0), 0)
 }
 
-// 計算單一平台的季度實際花費總額
+// 計算單一平台的季度實際支出總額
 const getPlatformQuarterlyExpense = (platform, quarter) => {
   const months = {
     1: ['JAN', 'FEB', 'MAR'],

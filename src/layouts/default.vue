@@ -480,7 +480,7 @@ const cogItems = [
     children: [
       {
         to: '/marketingExpenseManagement',
-        text: '實際花費管理',
+        text: '實際支出管理',
         icon: 'mdi-cash-100',
         roles: ['ADMIN', 'MANAGER']
       },
