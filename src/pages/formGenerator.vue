@@ -802,7 +802,7 @@ definePage({
   meta: {
     title: '表單產生器 | GInternational',
     login: true,
-    roles: [UserRole.ADMIN, UserRole.MANAGER]
+    roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.USER]
   }
 })
 

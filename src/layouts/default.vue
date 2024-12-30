@@ -58,74 +58,87 @@
     >
       <v-list class="h-100 d-flex flex-column pa-0">
         <div>
-          <v-card
-            v-show="!rail"
-            v-tooltip="'個人資料管理'"
-            elevation="0"
-            rounded="0"
-            height="172"
-            width="260"
-            class="pa-0 card-bg position-relative"
-            :class="{ 'loaded': isBackgroundLoaded }"
-            to="/profile"
-          >
-            <!-- 添加 skeleton -->
-            <v-skeleton-loader
-              v-if="!isBackgroundLoaded"
-              class="position-absolute w-100 h-100 pa-0 ma-0"
-            />
-
-            <!-- 添加隱藏的圖片用於預加載 -->
-            <img
-              src="/src/assets/image/bg_profile_purpleflower.webp"
-              alt="background"
-              style="display: none;"
-              @load="handleImageLoad"
+          <template v-if="!rail">
+            <v-card
+              v-tooltip="'個人資料管理'"
+              elevation="0"
+              rounded="0"
+              height="172"
+              width="260"
+              class="pa-0 card-bg position-relative"
+              :class="{ 'loaded': isBackgroundLoaded }"
+              to="/profile"
             >
-            <div class="card-blur pt-2 pb-4 px-2">
-              <v-card-title
-                class="ps-5 pb-3 d-flex justify-space-between pe-2"
+              <!-- 添加 skeleton -->
+              <v-skeleton-loader
+                v-if="!isBackgroundLoaded"
+                class="position-absolute w-100 h-100 pa-0 ma-0"
+              />
+
+              <!-- 添加隱藏的圖片用於預加載 -->
+              <img
+                src="/src/assets/image/bg_profile_purpleflower.webp"
+                alt="background"
+                style="display: none;"
+                @load="handleImageLoad"
               >
-                <v-avatar
-                  size="48"
-                  style="box-shadow: 0 0 10px rgba(255,255,255,1);"
+              <div class="card-blur pt-2 pb-4 px-2">
+                <v-card-title
+                  class="ps-5 pb-3 d-flex justify-space-between pe-2"
                 >
-                  <v-skeleton-loader
-                    v-if="!isAvatarLoaded"
-                    type="avatar"
-                  />
-                  <v-img
-                    v-show="isAvatarLoaded"
-                    :src="user.avatar"
-                    @load="handleAvatarLoad"
-                  />
-                </v-avatar>
-              </v-card-title>
-              <v-card-text style="letter-spacing: 2px; color: white; line-height: 24px;">
-                <v-row>
-                  <v-col
-                    cols="12"
-                    class="ps-4 pb-0 pt-4"
+                  <v-avatar
+                    size="48"
+                    style="box-shadow: 0 0 10px rgba(255,255,255,1);"
                   >
-                    <span style="font-size: 17px; font-weight: 600;">{{ user.name }}</span>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    class="ps-4 pb-0 pt-0"
-                  >
-                    <span>{{ user.userId }}</span>
-                    <span v-if="user.isAdmin">{{ user.adminId }}</span>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    class="ps-4 pb-0 pt-0"
-                  >
-                    {{ getRoleTitle(user.role) }}
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </div>
-          </v-card>
+                    <v-skeleton-loader
+                      v-if="!isAvatarLoaded"
+                      type="avatar"
+                    />
+                    <v-img
+                      v-show="isAvatarLoaded"
+                      :src="user.avatar"
+                      @load="handleAvatarLoad"
+                    />
+                  </v-avatar>
+                </v-card-title>
+                <v-card-text style="letter-spacing: 2px; color: white; line-height: 24px;">
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      class="ps-4 pb-0 pt-4"
+                    >
+                      <span style="font-size: 17px; font-weight: 600;">{{ user.name }}</span>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      class="ps-4 pb-0 pt-0"
+                    >
+                      <span>{{ user.userId }}</span>
+                      <span v-if="user.isAdmin">{{ user.adminId }}</span>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      class="ps-4 pb-0 pt-0"
+                    >
+                      {{ getRoleTitle(user.role) }}
+                    </v-col>
+                  </v-row>
+                </v-card-text>
+              </div>
+            </v-card>
+          </template>
+          <template v-else>
+            <v-list-item
+              to="/profile"
+              color="grey-darken-3"
+              class="mt-2"
+            >
+              <template #prepend>
+                <v-icon>mdi-account-circle-outline</v-icon>
+              </template>
+              <v-list-item-title>個人資料管理</v-list-item-title>
+            </v-list-item>
+          </template>
           <v-list-item
             v-for="userItem in filteredUserItems"
             :key="userItem.to"
@@ -197,7 +210,7 @@
             opacity="0.3"
             class="my-2"
           />
-          <template v-if="!user.isUser">
+          <template v-if="user.isLogin">
             <template
               v-for="item in filteredAdminItems"
               :key="item.text"
@@ -345,7 +358,7 @@
             v-if="user.isAdmin"
             class="mt-4"
           />
-          <template v-if="!user.isUser">
+          <template v-if="user.isLogin">
             <template
               v-for="item in filteredAdminItems"
               :key="item.text"
@@ -462,13 +475,13 @@ const userItems = [
     to: '/formGenerator',
     text: '表單產生器',
     icon: 'mdi-list-box-outline',
-    roles: ['ADMIN', 'MANAGER']
+    roles: ['ADMIN', 'MANAGER', 'USER']
   },
   {
     to: '/marketingAnalysis',
     text: '行銷費用分析',
     icon: 'mdi-chart-multiple',
-    roles: ['ADMIN', 'MANAGER']
+    roles: ['ADMIN', 'MANAGER', 'USER']
   }
 ]
 
@@ -482,13 +495,13 @@ const cogItems = [
         to: '/marketingExpenseManagement',
         text: '實際支出管理',
         icon: 'mdi-cash-100',
-        roles: ['ADMIN', 'MANAGER']
+        roles: ['ADMIN', 'MANAGER', 'USER']
       },
       {
         to: '/marketingBudgetManagement',
         text: '行銷預算管理',
         icon: 'mdi-table-edit',
-        roles: ['ADMIN', 'MANAGER']
+        roles: ['ADMIN', 'MANAGER', 'USER']
       },
       {
         to: '/marketingCategoryManagement',
@@ -529,6 +542,8 @@ const filteredCogItems = computed(() => {
           return user.isAdmin
         case 'MANAGER':
           return user.isManager
+        case 'USER':
+          return user.isUser
         default:
           return false
       }
@@ -543,6 +558,8 @@ const filteredCogItems = computed(() => {
               return user.isAdmin
             case 'MANAGER':
               return user.isManager
+            case 'USER':
+              return user.isUser
             default:
               return false
           }

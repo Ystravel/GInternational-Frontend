@@ -3,64 +3,97 @@
     min-width="2160"
   >
     <!-- 搜尋條件區塊 -->
-    <v-row class="elevation-4 rounded-lg py-4 py-sm-8 px-1 px-sm-10 mt-2 mt-sm-6 mx-0 mx-sm-4 mx-md-4 mb-4 bg-white">
-      <v-col cols="12">
-        <h3>行銷費用分析</h3>
-      </v-col>
+    <v-row class="elevation-4 rounded-lg py-4 pt-sm-8 px-1 px-sm-10 mt-2 mt-sm-6 mx-0 mx-sm-4 mx-md-4 mb-4 bg-white">
       <v-col cols="12">
         <v-row>
-          <!-- 搜尋條件 -->
-          
-          
-          <v-col cols="4">
-            <v-select
-              v-model="searchForm.reportType"
-              :items="reportTypeOptions"
-              label="報表類型"
-              variant="outlined"
-              density="compact"
-              :error-messages="reportTypeError"
-              clearable
-              @update:model-value="handleReportTypeChange"
-            />
+          <v-col cols="6">
+            <h3>行銷費用分析</h3>
           </v-col>
-          <v-col cols="4">
-            <v-autocomplete
-              v-model="searchForm.theme"
-              :items="themeOptions"
-              label="行銷主題"
-              item-title="name"
-              item-value="_id"
-              variant="outlined"
-              density="compact"
-              :error-messages="themeError"
-              clearable
-              @update:model-value="handleThemeChange"
-            />
-          </v-col>
-          <v-col cols="4">
-            <v-select
-              v-model="searchForm.year"
-              :items="yearOptions"
-              label="年度"
-              variant="outlined"
-              density="compact"
-              :error-messages="yearError"
-              clearable
-              @update:model-value="handleYearChange"
-            />
-          </v-col>
-          <v-col
-            cols="12"
-            class="d-flex justify-end"
-          >
-            <v-btn
-              color="purple-darken-2"
-              :loading="isLoading"
-              @click="generateReport"
-            >
-              查看報表
-            </v-btn>
+          <v-col cols="6">
+            <v-row>
+              <v-col cols="12">
+                <v-row>
+                  <!-- 搜尋條件 -->
+                  <v-col>
+                    <v-select
+                      v-model="searchForm.reportType"
+                      :items="reportTypeOptions"
+                      label="報表類型"
+                      variant="outlined"
+                      density="compact"
+                      :error-messages="reportTypeError"
+                      clearable
+                      @update:model-value="handleReportTypeChange"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-autocomplete
+                      v-model="searchForm.theme"
+                      :items="themeOptions"
+                      label="行銷主題"
+                      item-title="name"
+                      item-value="_id"
+                      variant="outlined"
+                      density="compact"
+                      :error-messages="themeError"
+                      clearable
+                      @update:model-value="handleThemeChange"
+                    />
+                  </v-col>
+                  <v-col>
+                    <v-select
+                      v-model="searchForm.year"
+                      :items="yearOptions"
+                      label="年度"
+                      variant="outlined"
+                      density="compact"
+                      :error-messages="yearError"
+                      clearable
+                      @update:model-value="handleYearChange"
+                    />
+                  </v-col>
+                  <v-col v-if="searchForm.reportType === 'lineExpense'">
+                    <v-autocomplete
+                      v-model="searchForm.line"
+                      :items="lineOptions"
+                      label="線別"
+                      item-title="name"
+                      item-value="_id"
+                      variant="outlined"
+                      density="compact"
+                      :error-messages="lineError"
+                      clearable
+                      multiple
+                      @update:model-value="handleLineChange"
+                    />
+                  </v-col>
+                  <v-col v-if="searchForm.reportType === 'lineExpense'">
+                    <v-select
+                      v-model="searchForm.month"
+                      :items="monthOptions"
+                      item-title="name"
+                      item-value="value"
+                      label="月份"
+                      variant="outlined"
+                      density="compact"
+                      :error-messages="monthError"
+                      clearable
+                      @update:model-value="handleMonthChange"
+                    />
+                  </v-col>
+                  <v-col cols="2">
+                    <v-btn
+                      color="purple-darken-2"
+                      :loading="isLoading"
+                      block
+                      @click="generateReport"
+                    >
+                      查看報表
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-col>
@@ -1225,6 +1258,53 @@
             </tbody>
           </table>
         </div>
+
+        <!-- 行銷各線實際支出表 -->
+        <div
+          v-if="searchForm.reportType === 'lineExpense'"
+          class="budget-table-title"
+        >
+          <span class="text-orange-darken-2">{{ searchForm.year ? `${searchForm.year}` : '( 請先選擇年度 )' }}</span> 年度 
+          <span class="text-pink-darken-1">{{ searchForm.theme ? getThemeName(searchForm.theme) : '( 請先選擇行銷主題 )' }}</span> 
+          行銷各線實際支出表 ({{ searchForm.month ? `${searchForm.month}` : '( 請先選擇月份 )' }})
+        </div>
+
+        <table
+          v-if="searchForm.reportType === 'lineExpense'"
+          class="budget-table"
+        >
+          <thead>
+            <tr class="header-row">
+              <th class="header-cell">
+                平台
+              </th>
+              <th
+                v-for="line in searchForm.line"
+                :key="line"
+                class="header-cell"
+              >
+                {{ getLineName(line) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="platform in reportData"
+              :key="platform.platformName"
+            >
+              <td class="platform-col">
+                {{ platform.platformName }}
+              </td>
+              <td
+                v-for="line in searchForm.line"
+                :key="line"
+                class="month-col"
+              >
+                {{ formatMonthValue(platform.expenses[line] || 0) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </v-col>
     </v-row>
   </v-container>
@@ -1264,12 +1344,16 @@ const showReport = ref(false)
 const searchForm = ref({
   year: null,
   theme: null,
-  reportType: null
+  reportType: null,
+  line: [],
+  month: null
 })
 
 const yearError = ref('')
 const themeError = ref('')
 const reportTypeError = ref('')
+const lineError = ref('')
+const monthError = ref('')
 
 // ===== 選項資料 =====
 const yearOptions = ref([])
@@ -1278,8 +1362,10 @@ const reportTypeOptions = ref([
   { title: '行銷預算表', value: 'budget' },
   { title: '行銷實際支出表', value: 'expense' },
   { title: '行銷預算與實際支出比較表', value: 'comparison' },
-  { title: '行銷各線實際支出表'}
+  { title: '行銷各線實際支出表', value: 'lineExpense' }
 ])
+const lineOptions = ref([])
+const monthOptions = ref([])
 
 // ===== 報表資料 =====
 const reportData = ref([])
@@ -1288,9 +1374,10 @@ const reportData = ref([])
 // 載入選項資料
 const loadOptions = async () => {
   try {
-    const [yearResponse, themeResponse] = await Promise.all([
+    const [yearResponse, themeResponse, lineResponse] = await Promise.all([
       apiAuth.get('/marketing/budgets/years'),
-      apiAuth.get('/marketing/categories/options', { params: { type: 0 } })
+      apiAuth.get('/marketing/categories/options', { params: { type: 0 } }),
+      apiAuth.get('/marketing/categories/options', { params: { type: 3 } }) // 抓取線別
     ])
 
     if (yearResponse.data.success) {
@@ -1299,6 +1386,15 @@ const loadOptions = async () => {
     if (themeResponse.data.success) {
       themeOptions.value = themeResponse.data.result
     }
+    if (lineResponse.data.success) {
+      lineOptions.value = lineResponse.data.result
+    }
+
+    // 設定月份選項
+    monthOptions.value = Array.from({ length: 12 }, (_, i) => ({
+      name: `${i + 1}月`,
+      value: i + 1
+    }))
   } catch (error) {
     handleError(error)
   }
@@ -1404,6 +1500,16 @@ const handleReportTypeChange = () => {
   showReport.value = false
 }
 
+const handleLineChange = () => {
+  lineError.value = ''
+  showReport.value = false
+}
+
+const handleMonthChange = () => {
+  monthError.value = ''
+  showReport.value = false
+}
+
 // 產生報表
 const generateReport = async () => {
   try {
@@ -1418,7 +1524,11 @@ const generateReport = async () => {
       yearError.value = '請選擇年度'
       return
     }
-    
+    if (searchForm.value.reportType === 'lineExpense' && (!searchForm.value.line.length || !searchForm.value.month)) {
+      lineError.value = '請選擇線別'
+      monthError.value = '請選擇月份'
+      return
+    }
 
     isLoading.value = true
     let result
@@ -1470,6 +1580,26 @@ const generateReport = async () => {
           }
         } catch (error) {
           console.error('Error fetching comparison data:', error)
+          handleError(error)
+        }
+        break
+
+      case 'lineExpense':
+        try {
+          const { data: lineExpenseData } = await apiAuth.get('/marketing/expenses/line-expenses', {
+            params: {
+              year: searchForm.value.year,
+              theme: searchForm.value.theme,
+              lines: searchForm.value.line,
+              month: searchForm.value.month
+            }
+          })
+
+          if (lineExpenseData.success && Array.isArray(lineExpenseData.result)) {
+            result = processLineExpenseData(lineExpenseData.result)
+          }
+        } catch (error) {
+          console.error('Error fetching line expense data:', error)
           handleError(error)
         }
         break
@@ -2403,6 +2533,35 @@ const getPlatformQuarterlyExpense = (platform, quarter) => {
 // 計算單一平台的季度差異
 const getPlatformQuarterlyDifference = (platform, quarter) => {
   return getPlatformQuarterlyBudget(platform, quarter) - getPlatformQuarterlyExpense(platform, quarter)
+}
+
+const getLineName = (lineId) => {
+  const line = lineOptions.value.find(l => l._id === lineId)
+  return line ? line.name : ''
+}
+
+// 定義 processLineExpenseData 函數
+const processLineExpenseData = (data) => {
+  const platformMap = {}
+
+  data.forEach(item => {
+    const platformName = item.platformName
+    if (!platformMap[platformName]) {
+      platformMap[platformName] = {}
+    }
+
+    Object.keys(item.expenses).forEach(lineName => {
+      if (!platformMap[platformName][lineName]) {
+        platformMap[platformName][lineName] = 0
+      }
+      platformMap[platformName][lineName] += item.expenses[lineName]
+    })
+  })
+
+  return Object.keys(platformMap).map(platformName => ({
+    platformName,
+    expenses: platformMap[platformName]
+  }))
 }
 </script>
 
