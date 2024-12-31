@@ -445,17 +445,30 @@
 
                           <!-- 快速填入按鈕 -->
                           <td class="quick-fill-col">
-                            <v-btn
-                              v-tooltip="'快速填入所有月份金額'"
-                              icon
-                              size="24"
-                              color="teal-darken-2"
-                              @click="showQuickFillDialog(channelIndex, platformIndex)"
-                            >
-                              <v-icon size="16">
-                                mdi-pencil-plus-outline
-                              </v-icon>
-                            </v-btn>
+                            <div class="h-100 py-2 d-flex flex-column align-center justify-space-between">
+                              <v-btn
+                                v-tooltip="'快速填入所有月份金額'"
+                                icon
+                                size="20"
+                                color="teal-darken-2"
+                                @click="showQuickFillDialog(channelIndex, platformIndex)"
+                              >
+                                <v-icon size="14">
+                                  mdi-pencil-plus-outline
+                                </v-icon>
+                              </v-btn>
+                              <v-btn
+                                v-tooltip="'刪除所有月份金額'"
+                                icon
+                                size="20"
+                                color="red-lighten-1"
+                                @click="clearAllMonths(channelIndex, platformIndex)"
+                              >
+                                <v-icon size="14">
+                                  mdi-eraser
+                                </v-icon>
+                              </v-btn>
+                            </div>
                           </td>
 
                           <!-- 月份金額輸入 -->
@@ -1396,6 +1409,20 @@ watch(
     }
   }
 )
+
+// 在 script setup 中添加清空所有月份金額的方法
+// 清空所有月份金額
+const clearAllMonths = (channelIndex, platformIndex) => {
+  const platform = budgetData.value[channelIndex].platforms[platformIndex]
+  Object.keys(monthList).forEach(month => {
+    platform.budget[month] = ''
+  })
+  
+  createSnackbar({
+    text: '已清空所有月份金額',
+    snackbarProps: { color: 'teal-lighten-1' }
+  })
+}
 </script>
 
 <style lang="scss" scoped>

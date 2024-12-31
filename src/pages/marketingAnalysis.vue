@@ -1375,13 +1375,261 @@
             </tbody>
           </table>
         </div>
+
+        <div
+          v-if="searchForm.reportType === 'lineExpenseTotal'"
+          class="budget-table-title"
+        >
+          <span class="text-orange-darken-2">{{ searchForm.year ? `${searchForm.year}` : '( 請先選擇年度 )' }}</span> 年度 
+          <span class="text-pink-darken-1">{{ searchForm.theme ? getThemeName(searchForm.theme) : '( 請先選擇行銷主題 )' }}</span> 
+          行銷各線實際支出總表
+        </div>
+
+        <div class="table-container">
+          <table
+            v-if="searchForm.reportType === 'lineExpenseTotal'"
+            class="budget-table line-expense-total-table"
+          >
+            <thead>
+              <tr class="header-row">
+                <th
+                  rowspan="1"
+                  class="header-cell"
+                >
+                  線別
+                </th>
+                <th class="header-cell">
+                  JAN
+                </th>
+                <th class="header-cell">
+                  FEB
+                </th>
+                <th class="header-cell">
+                  MAR
+                </th>
+                <th class="header-cell-quarter">
+                  Q1
+                </th>
+                <th class="header-cell">
+                  APR
+                </th>
+                <th class="header-cell">
+                  MAY
+                </th>
+                <th class="header-cell">
+                  JUN
+                </th>
+                <th class="header-cell-quarter">
+                  Q2
+                </th>
+                <th class="header-cell">
+                  JUL
+                </th>
+                <th class="header-cell">
+                  AUG
+                </th>
+                <th class="header-cell">
+                  SEP
+                </th>
+                <th class="header-cell-quarter">
+                  Q3
+                </th>
+                <th class="header-cell">
+                  OCT
+                </th>
+                <th class="header-cell">
+                  NOV
+                </th>
+                <th class="header-cell">
+                  DEC
+                </th>
+                <th class="header-cell-quarter">
+                  Q4
+                </th>
+                <th class="header-cell">
+                  Total
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(line, index) in reportData"
+                :key="line.lineName"
+                :class="{ 'row-odd': index % 2 === 0 }"
+              >
+                <td class="channel-col">
+                  {{ line.lineName }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.JAN) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.FEB) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.MAR) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterTotal(line.expenses, 1)) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.APR) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.MAY) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.JUN) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterTotal(line.expenses, 2)) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.JUL) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.AUG) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.SEP) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterTotal(line.expenses, 3)) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.OCT) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.NOV) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(line.expenses.DEC) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterTotal(line.expenses, 4)) }}
+                </td>
+                <td class="total-col">
+                  {{ formatMonthValue(getPlatformTotal(line.expenses)) }}
+                </td>
+              </tr>
+              <!-- 月度總計列 -->
+              <tr class="monthly-total-row">
+                <td>
+                  月度總計
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('JAN')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('FEB')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('MAR')) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterlyTotal(1)) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('APR')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('MAY')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('JUN')) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterlyTotal(2)) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('JUL')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('AUG')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('SEP')) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterlyTotal(3)) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('OCT')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('NOV')) }}
+                </td>
+                <td class="month-col">
+                  {{ formatMonthValue(getMonthlyTotal('DEC')) }}
+                </td>
+                <td class="quarter-col">
+                  {{ formatQuarterValue(getQuarterlyTotal(4)) }}
+                </td>
+                <td class="total-col highlight-total">
+                  {{ formatMonthValue(getGrandTotal()) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </v-col>
+    </v-row>
+
+    <!-- 在總表下方添加圖表容器 -->
+    <v-row
+      v-if="searchForm.reportType === 'lineExpenseTotal' && showReport"
+      class="elevation-4 rounded-lg py-sm-8 px-1 px-sm-4 mt-2 mt-sm-6 mx-0 mx-sm-4 mx-md-4 mb-4 bg-white"
+    >
+      <v-col cols="12">
+        <div class="d-flex justify-end mb-4 pe-4">
+          <v-btn
+            color="red-darken-1"
+            prepend-icon="mdi-file-chart"
+            :loading="isExporting"
+            @click="exportChartsToPDF"
+          >
+            匯出圖表
+          </v-btn>
+        </div>
+        <div class="charts-container mt-8">
+          <v-row>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex justify-center align-center"
+            >
+              <div class="chart-box rounded-lg py-4 px-4 bg-white">
+                <ECharts
+                  ref="pieChart"
+                  :option="pieChartOption"
+                  :init-options="{ renderer: 'canvas' }"
+                  style="width: 100%; height: 400px;"
+                />
+              </div>
+            </v-col>
+            <v-col
+              cols="12"
+              md="6"
+              class="d-flex justify-center align-center"
+            >
+              <div class="chart-box rounded-lg py-4 px-4 bg-white">
+                <ECharts
+                  ref="barChart"
+                  :option="barChartOption"
+                  :init-options="{ renderer: 'canvas' }"
+                  style="width: 100%; height: 400px;"
+                />
+              </div>
+            </v-col>
+          </v-row>
+        </div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed, nextTick, onUnmounted } from 'vue'
 import { useApi } from '@/composables/axios'
 import { useSnackbar } from 'vuetify-use-dialog'
 import { useUserStore } from '@/stores/user'
@@ -1389,6 +1637,24 @@ import { useRouter } from 'vue-router'
 import { definePage } from 'vue-router/auto'
 import UserRole from '@/enums/UserRole'
 import html2pdf from 'html2pdf.js'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { PieChart, BarChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent,
+  DataZoomComponent,
+  ToolboxComponent
+} from 'echarts/components'
+import VChart from 'vue-echarts'
+import * as echarts from 'echarts/core'
+import { jsPDF } from 'jspdf'
+import html2canvas from 'html2canvas'
+
+// 重命名 VChart 為 ECharts
+const ECharts = VChart
 
 // ===== 頁面設定 =====
 definePage({
@@ -1429,11 +1695,11 @@ const monthError = ref('')
 const yearOptions = ref([])
 const themeOptions = ref([])
 const reportTypeOptions = ref([
-  { title: '行銷預算表', value: 'budget' },
+  { title: '行銷廣告預算表', value: 'budget' },
   { title: '行銷實際支出表', value: 'expense' },
   { title: '行銷預算與實際支出比較表', value: 'comparison' },
   { title: '行銷各線實際支出表', value: 'lineExpense' },
-  // { title: '行銷各線實際支出表 (總表)', value: 'lineExpenseTotal' },
+  { title: '行銷各線實際支出總表', value: 'lineExpenseTotal' },
 ])
 const lineOptions = ref([])
 const monthOptions = ref([])
@@ -1701,6 +1967,24 @@ const generateReport = async () => {
           handleError(error)
         }
         break
+
+      case 'lineExpenseTotal':
+        try {
+          const { data: lineExpenseTotalData } = await apiAuth.get('/marketing/expenses/line-expenses-total', {
+            params: {
+              year: searchForm.value.year,
+              theme: searchForm.value.theme
+            }
+          })
+
+          if (lineExpenseTotalData.success) {
+            result = lineExpenseTotalData.result
+          }
+        } catch (error) {
+          console.error('Error fetching line expense total data:', error)
+          handleError(error)
+        }
+        break
     }
 
     if (result) {
@@ -1794,6 +2078,10 @@ const getPlatformTotal = (budget) => {
 
 // 計算月度總額
 const getMonthlyTotal = (month) => {
+  if (searchForm.value.reportType === 'lineExpenseTotal') {
+    return formatMonthValue(getLineExpenseTotalMonthly(month))
+  }
+
   let total = 0
   if (searchForm.value.reportType === 'expense') {
     total = reportData.value.reduce((sum, channel) => {
@@ -1813,6 +2101,10 @@ const getMonthlyTotal = (month) => {
 
 // 計算季度總額
 const getQuarterlyTotal = (quarter) => {
+  if (searchForm.value.reportType === 'lineExpenseTotal') {
+    return formatQuarterValue(getLineExpenseTotalQuarterly(quarter))
+  }
+
   const monthMap = {
     1: ['JAN', 'FEB', 'MAR'],
     2: ['APR', 'MAY', 'JUN'],
@@ -1830,6 +2122,10 @@ const getQuarterlyTotal = (quarter) => {
 
 // 計算總額
 const getGrandTotal = () => {
+  if (searchForm.value.reportType === 'lineExpenseTotal') {
+    return formatMonthValue(getLineExpenseTotalGrand())
+  }
+
   if (searchForm.value.reportType === 'expense') {
     return reportData.value.reduce((sum, channel) => {
       return sum + channel.platforms.reduce((platformSum, platform) => {
@@ -2728,6 +3024,482 @@ const selectAllLines = () => {
   handleLineChange()
 }
 
+// 在 script setup 中添加總表專用的計算方法
+const getLineExpenseTotalMonthly = (month) => {
+  if (!reportData.value || searchForm.value.reportType !== 'lineExpenseTotal') return 0
+  return reportData.value.reduce((sum, line) => sum + (Number(line.expenses[month]) || 0), 0)
+}
+
+const getLineExpenseTotalQuarterly = (quarter) => {
+  if (!reportData.value || searchForm.value.reportType !== 'lineExpenseTotal') return 0
+  const months = {
+    1: ['JAN', 'FEB', 'MAR'],
+    2: ['APR', 'MAY', 'JUN'],
+    3: ['JUL', 'AUG', 'SEP'],
+    4: ['OCT', 'NOV', 'DEC']
+  }[quarter]
+
+  return months.reduce((sum, month) => sum + getLineExpenseTotalMonthly(month), 0)
+}
+
+const getLineExpenseTotalGrand = () => {
+  if (!reportData.value || searchForm.value.reportType !== 'lineExpenseTotal') return 0
+  return reportData.value.reduce((sum, line) => {
+    return sum + Object.values(line.expenses).reduce((lineSum, value) => lineSum + (Number(value) || 0), 0)
+  }, 0)
+}
+
+// 添加圖表相關的計算屬性
+const pieChartOption = computed(() => {
+  if (!reportData.value || !Array.isArray(reportData.value) || reportData.value.length === 0) {
+    return {
+      title: {
+        text: '各線別費用佔比',
+        left: 'center',
+        top: 20,
+        textStyle: {
+          fontSize: 24,
+          fontWeight: 'bold',
+          padding: [0, 0, 20, 0]
+        }
+      },
+      series: [{
+        type: 'pie',
+        data: []
+      }]
+    }
+  }
+
+  // 計算總金額
+  const total = reportData.value.reduce((sum, line) => {
+    if (!line.expenses) return sum
+    return sum + Object.values(line.expenses).reduce((lineSum, value) => 
+      lineSum + (Number(value) || 0), 0
+    )
+  }, 0)
+
+  // 準備圓餅圖數據
+  const pieData = reportData.value
+    .filter(line => line.expenses)
+    .map(line => {
+      const lineTotal = Object.values(line.expenses).reduce((sum, value) => 
+        sum + (Number(value) || 0), 0
+      )
+      // 找到對應的 line option 以獲取 order
+      const lineOption = lineOptions.value.find(opt => opt.name === line.lineName)
+      return {
+        name: line.lineName || '',
+        value: lineTotal,
+        percentage: total > 0 ? ((lineTotal / total) * 100).toFixed(2) : '0.00',
+        order: lineOption?.order || 999 // 如果找不到 order，給一個大數字
+      }
+    })
+    .sort((a, b) => a.order - b.order) // 根據 order 排序
+
+  return {
+    tooltip: {
+      trigger: 'item',
+      formatter: (params) => {
+        return `${params.name}<br/>金額: ${params.value.toLocaleString('en-US')}<br/>佔比: ${params.data.percentage}%`
+      }
+    },
+    series: [
+      {
+        name: '費用佔比',
+        type: 'pie',
+        radius: ['30%', '70%'],
+        center: ['50%', '50%'],
+        roseType: false,
+        itemStyle: {
+          borderRadius: 3,
+          borderColor: '#fff',
+          borderWidth: 1
+        },
+        label: {
+          show: true,
+          formatter: (params) => {
+            return `${params.name}\n${params.value.toLocaleString('en-US')}\n${params.data.percentage}%`
+          },
+          fontSize: 11,
+          lineHeight: 15,
+          alignTo: 'edge',
+          edgeDistance: '8%',
+          distanceToLabelLine: 6
+        },
+        labelLine: {
+          show: true,
+          length: 15,
+          length2: 25,
+          minTurnAngle: 90,
+          maxSurfaceAngle: 90
+        },
+        labelLayout: {
+          hideOverlap: false,
+          moveOverlap: 'none',
+          draggable: true
+        },
+        emphasis: {
+          scale: true,
+          scaleSize: 10,
+          label: {
+            show: true,
+            fontSize: 14,
+            fontWeight: 'bold'
+          }
+        },
+        data: pieData,
+        animationType: 'scale',
+        animationEasing: 'elasticOut'
+      }
+    ]
+  }
+})
+
+const barChartOption = computed(() => {
+  if (!reportData.value || !Array.isArray(reportData.value) || reportData.value.length === 0) {
+    return {
+
+      xAxis: {
+        type: 'category',
+        data: []
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [{
+        type: 'bar',
+        data: []
+      }]
+    }
+  }
+
+  // 準備長條圖數據
+  const xAxisData = reportData.value
+    .filter(line => line.expenses) // 確保只處理有 expenses 的數據
+    .map(line => line.lineName || '')
+
+  const seriesData = reportData.value
+    .filter(line => line.expenses)
+    .map(line => 
+      Object.values(line.expenses).reduce((sum, value) => 
+        sum + (Number(value) || 0), 0
+      )
+    )
+
+  return {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      },
+      formatter: (params) => {
+        return `${params[0].name}<br/>金額: ${params[0].value.toLocaleString('en-US')}`
+      }
+    },
+    grid: {
+      left: '1%',      // 減少左邊距
+      right: '2%',     // 減少右邊距
+      top: '14%',
+      bottom: '4%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: xAxisData,
+      axisLabel: {
+        interval: 0,
+        rotate: 0
+      }
+    },
+    yAxis: {
+      type: 'value',
+      name: '金額',
+      nameGap: 25,     // 調整 Y 軸名稱與軸的距離
+      axisLabel: {
+        formatter: (value) => value.toLocaleString('en-US'),
+        margin: 4      // 調整 Y 軸標籤與軸的距離
+      }
+    },
+    series: [
+      {
+        name: '費用金額',
+        type: 'bar',
+        data: seriesData,
+        itemStyle: {
+          color: '#00ACC1',
+          borderRadius: [4, 4, 0, 0]
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params) => params.value.toLocaleString('en-US'),
+          distance: 15,
+          rotate: 20,
+          fontSize: 11,
+          overflow: 'break'
+        },
+        barWidth: '55%',
+        barGap: '100%'
+      }
+    ]
+  }
+})
+
+// 註冊必要的 ECharts 組件
+use([
+  CanvasRenderer,
+  PieChart,
+  BarChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent,
+  DataZoomComponent,
+  ToolboxComponent
+])
+
+// 在 script setup 中添加
+const pieChart = ref(null)
+const barChart = ref(null)
+
+// 監聽報表數據變化
+watch(() => reportData.value, (newData) => {
+  if (searchForm.value.reportType === 'lineExpenseTotal' && showReport.value && newData) {
+    nextTick(() => {
+      if (pieChart.value) {
+        pieChart.value.resize()
+      }
+      if (barChart.value) {
+        barChart.value.resize()
+      }
+    })
+  }
+}, { deep: true })
+
+// 監聽 showReport 變化
+watch(() => showReport.value, (newValue) => {
+  if (newValue && searchForm.value.reportType === 'lineExpenseTotal') {
+    nextTick(() => {
+      if (pieChart.value) {
+        pieChart.value.resize()
+      }
+      if (barChart.value) {
+        barChart.value.resize()
+      }
+    })
+  }
+})
+
+// 修改監聽器
+watch([() => reportData.value, () => showReport.value], ([newData, newShowReport]) => {
+  if (searchForm.value.reportType === 'lineExpenseTotal' && newShowReport && newData) {
+    nextTick(async () => {
+      // 等待一段時間確保 DOM 已經渲染
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      if (pieChart.value) {
+        pieChart.value.resize()
+        pieChart.value.setOption(pieChartOption.value)
+      }
+      if (barChart.value) {
+        barChart.value.resize()
+        barChart.value.setOption(barChartOption.value)
+      }
+    })
+  }
+}, { deep: true })
+
+// 添加視窗大小變化監聽
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
+
+const handleResize = () => {
+  if (searchForm.value.reportType === 'lineExpenseTotal' && showReport.value) {
+    nextTick(() => {
+      if (pieChart.value) {
+        pieChart.value.resize()
+      }
+      if (barChart.value) {
+        barChart.value.resize()
+      }
+    })
+  }
+}
+
+// 匯出圖表到 PDF
+const exportChartsToPDF = async () => {
+  try {
+    isExporting.value = true
+
+    // 創建圓餅圖容器
+    const pieContainer = document.createElement('div')
+    pieContainer.style.width = '1600px'
+    pieContainer.style.height = '900px'
+    pieContainer.style.backgroundColor = 'white'
+    document.body.appendChild(pieContainer)
+
+    // 創建長條圖容器
+    const barContainer = document.createElement('div')
+    barContainer.style.width = '1600px'
+    barContainer.style.height = '900px'
+    barContainer.style.backgroundColor = 'white'
+    document.body.appendChild(barContainer)
+
+    // 創建新的 ECharts 實例
+    const newPieChart = echarts.init(pieContainer, null, { renderer: 'canvas' })
+    const newBarChart = echarts.init(barContainer, null, { renderer: 'canvas' })
+
+    // 為匯出 PDF 創建特殊的圖表配置
+    const exportPieOption = {
+      ...pieChartOption.value,
+      title: {
+        ...pieChartOption.value.title,
+        textStyle: {
+          fontSize: 20,
+          fontWeight: 'bold'
+        }
+      },
+      tooltip: {
+        ...pieChartOption.value.tooltip,
+        textStyle: {
+          fontSize: 16
+        }
+      },
+      series: [{
+        ...pieChartOption.value.series[0],
+        label: {
+          ...pieChartOption.value.series[0].label,
+          fontSize: 16,
+          lineHeight: 24
+        },
+        emphasis: {
+          ...pieChartOption.value.series[0].emphasis,
+          label: {
+            ...pieChartOption.value.series[0].emphasis.label,
+            fontSize: 16
+          }
+        }
+      }]
+    }
+
+    const exportBarOption = {
+      ...barChartOption.value,
+      title: {
+        ...barChartOption.value.title,
+        textStyle: {
+          fontSize: 20,
+          fontWeight: 'bold'
+        }
+      },
+      tooltip: {
+        ...barChartOption.value.tooltip,
+        textStyle: {
+          fontSize: 16
+        }
+      },
+      xAxis: {
+        ...barChartOption.value.xAxis,
+        axisLabel: {
+          ...barChartOption.value.xAxis.axisLabel,
+          fontSize: 16
+        },
+        nameTextStyle: {
+          fontSize: 16
+        }
+      },
+      yAxis: {
+        ...barChartOption.value.yAxis,
+        nameTextStyle: {
+          fontSize: 16
+        },
+        axisLabel: {
+          ...barChartOption.value.yAxis.axisLabel,
+          fontSize: 16
+        }
+      },
+      series: [{
+        ...barChartOption.value.series[0],
+        label: {
+          ...barChartOption.value.series[0].label,
+          fontSize: 16
+        }
+      }]
+    }
+
+    // 設置圖表選項
+    newPieChart.setOption(exportPieOption)
+    newBarChart.setOption(exportBarOption)
+
+    // 等待圖表渲染完成
+    await new Promise(resolve => setTimeout(resolve, 500))
+
+    try {
+      // 分別匯出兩個圖表
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      })
+
+      // A4 橫式尺寸為 297mm x 210mm
+      // 計算置中的位置
+      const pageWidth = 297
+      const pageHeight = 210
+      const imageWidth = 255
+      const imageHeight = 142
+      const x = (pageWidth - imageWidth) / 2
+      const y = (pageHeight - imageHeight) / 2
+
+      // 轉換圓餅圖為圖片並添加到第一頁
+      const pieCanvas = await html2canvas(pieContainer, {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      })
+      const pieImgData = pieCanvas.toDataURL('image/jpeg', 1.0)
+      doc.addImage(pieImgData, 'JPEG', x, y, imageWidth, imageHeight)
+
+      // 添加新頁面
+      doc.addPage()
+
+      // 轉換長條圖為圖片並添加到第二頁
+      const barCanvas = await html2canvas(barContainer, {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      })
+      const barImgData = barCanvas.toDataURL('image/jpeg', 1.0)
+      doc.addImage(barImgData, 'JPEG', x, y, imageWidth, imageHeight)
+
+      // 保存 PDF
+      doc.save(`${searchForm.value.year}年度${getThemeName(searchForm.value.theme)}行銷各線實際支出統計圖表.pdf`)
+      createSnackbar({ text: 'PDF 匯出成功', snackbarProps: { color: 'teal-lighten-1' } })
+    } catch (error) {
+      console.error('PDF 生成失敗:', error)
+      throw error
+    } finally {
+      // 清理
+      newPieChart.dispose()
+      newBarChart.dispose()
+      document.body.removeChild(pieContainer)
+      document.body.removeChild(barContainer)
+    }
+  } catch (error) {
+    handleError(error)
+  } finally {
+    isExporting.value = false
+  }
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -2745,6 +3517,54 @@ const selectAllLines = () => {
   border-spacing: 0;
   border-collapse: separate;
   overflow: hidden;
+
+  &.line-expense-total-table {
+    :deep(thead) {
+      .header-row {
+        .header-cell {
+          min-width: 80px !important;
+          width: 80px !important;
+
+          &:first-child {
+            width: 180px !important;
+            min-width: 180px !important;
+          }
+        }
+
+        .header-cell-quarter {
+          min-width: 80px !important;
+          width: 80px !important;
+        }
+      }
+    }
+
+    :deep(tbody) {
+      td {
+        min-width: 80px !important;
+        width: 80px !important;
+
+        &:first-child {
+          width: 180px !important;
+          min-width: 180px !important;
+        }
+
+        &.month-col {
+          min-width: 80px !important;
+          width: 80px !important;
+        }
+
+        &.quarter-col {
+          min-width: 80px !important;
+          width: 80px !important;
+        }
+
+        &.total-col {
+          min-width: 80px !important;
+          width: 80px !important;
+        }
+      }
+    }
+  }
 
   :deep(thead) {
     .header-row {
@@ -2958,5 +3778,20 @@ const selectAllLines = () => {
   
 // }
 
+.charts-container {
+  width: 100%;
+  display: flex;
+  .chart-box {
+    width: 100%;
+    height: 100%;
+    min-height: 800px;
+  }
+
+  :deep(.echarts) {
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
 
 </style>
+

@@ -139,18 +139,54 @@
               <v-list-item-title>個人資料管理</v-list-item-title>
             </v-list-item>
           </template>
-          <v-list-item
+          <template
             v-for="userItem in filteredUserItems"
-            :key="userItem.to"
-            :to="userItem.to"
-            color="grey-darken-3"
-            class="mt-2"
+            :key="userItem.text"
           >
-            <template #prepend>
-              <v-icon>{{ userItem.icon }}</v-icon>
-            </template>
-            <v-list-item-title>{{ userItem.text }}</v-list-item-title>
-          </v-list-item>
+            <!-- 有子選單的項目 -->
+            <v-list-group
+              v-if="userItem.children"
+              :value="openedGroups.includes(userItem.text)"
+              @click="toggleGroup(userItem.text)"
+            >
+              <template #activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  color="grey-darken-3"
+                >
+                  <template #prepend>
+                    <v-icon>{{ userItem.icon }}</v-icon>
+                  </template>
+                  <v-list-item-title>{{ userItem.text }}</v-list-item-title>
+                </v-list-item>
+              </template>
+
+              <v-list-item
+                v-for="child in userItem.children"
+                :key="child.to"
+                :to="child.to"
+                color="grey-darken-3"
+              >
+                <template #prepend>
+                  <v-icon>{{ child.icon }}</v-icon>
+                </template>
+                <v-list-item-title>{{ child.text }}</v-list-item-title>
+              </v-list-item>
+            </v-list-group>
+
+            <!-- 沒有子選單的項目 -->
+            <v-list-item
+              v-else
+              :to="userItem.to"
+              color="grey-darken-3"
+              class="mt-2"
+            >
+              <template #prepend>
+                <v-icon>{{ userItem.icon }}</v-icon>
+              </template>
+              <v-list-item-title>{{ userItem.text }}</v-list-item-title>
+            </v-list-item>
+          </template>
           <v-divider
             color="grey-darken-3"
             opacity="0.3"
@@ -341,18 +377,54 @@
             </div>
           </v-card>
           <!-- 所有登入用戶都可以看到的功能選單 -->
-          <v-list-item
+          <template
             v-for="userItem in filteredUserItems"
-            :key="userItem.to"
-            :to="userItem.to"
-            color="grey-darken-3"
-            class="mt-4"
+            :key="userItem.text"
           >
-            <template #prepend>
-              <v-icon>{{ userItem.icon }}</v-icon>
-            </template>
-            <v-list-item-title>{{ userItem.text }}</v-list-item-title>
-          </v-list-item>
+            <!-- 有子選單的項目 -->
+            <v-list-group
+              v-if="userItem.children"
+              :value="openedGroups.includes(userItem.text)"
+              @click="toggleGroup(userItem.text)"
+            >
+              <template #activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  color="grey-darken-3"
+                >
+                  <template #prepend>
+                    <v-icon>{{ userItem.icon }}</v-icon>
+                  </template>
+                  <v-list-item-title>{{ userItem.text }}</v-list-item-title>
+                </v-list-item>
+              </template>
+
+              <v-list-item
+                v-for="child in userItem.children"
+                :key="child.to"
+                :to="child.to"
+                color="grey-darken-3"
+              >
+                <template #prepend>
+                  <v-icon>{{ child.icon }}</v-icon>
+                </template>
+                <v-list-item-title>{{ child.text }}</v-list-item-title>
+              </v-list-item>
+            </v-list-group>
+
+            <!-- 沒有子選單的項目 -->
+            <v-list-item
+              v-else
+              :to="userItem.to"
+              color="grey-darken-3"
+              class="mt-2"
+            >
+              <template #prepend>
+                <v-icon>{{ userItem.icon }}</v-icon>
+              </template>
+              <v-list-item-title>{{ userItem.text }}</v-list-item-title>
+            </v-list-item>
+          </template>
           <!-- 管理者功能選單 -->
           <v-divider
             v-if="user.isAdmin"
@@ -475,14 +547,13 @@ const userItems = [
     to: '/formGenerator',
     text: '表單產生器',
     icon: 'mdi-list-box-outline',
-    roles: ['ADMIN', 'MANAGER', 'USER']
   },
   {
     to: '/marketingAnalysis',
     text: '行銷費用分析',
     icon: 'mdi-chart-multiple',
-    roles: ['ADMIN', 'MANAGER', 'USER']
-  }
+  },
+
 ]
 
 const cogItems = [
@@ -503,12 +574,19 @@ const cogItems = [
         icon: 'mdi-table-edit',
         roles: ['ADMIN', 'MANAGER', 'USER']
       },
+      // {
+      //   to: '/marketingReportDownload',
+      //   text: '行銷報表下載',
+      //   icon: 'mdi-file-download-outline',
+      //   roles: ['ADMIN', 'MANAGER']
+      // },
       {
         to: '/marketingCategoryManagement',
         text: '行銷分類管理',
         icon: 'mdi-shape-plus-outline',
         roles: ['ADMIN', 'MANAGER']
-      }
+      },
+      
     ]
   },
 ]
@@ -632,8 +710,7 @@ const filteredUserItems = computed(() => {
     // 如果沒有設定角色限制，所有人都可以看到
     if (!item.roles || item.roles.length === 0) return true
 
-    // 檢查用戶是否有權限看到這個選單項目
-    return item.roles.some(role => {
+    const hasPermission = item.roles.some(role => {
       switch (role) {
         case 'ADMIN':
           return user.isAdmin
@@ -645,6 +722,28 @@ const filteredUserItems = computed(() => {
           return false
       }
     })
+
+    // 如果有子項目，也需要檢查子項目的權限
+    if (item.children) {
+      item.children = item.children.filter(child => {
+        return child.roles.some(role => {
+          switch (role) {
+            case 'ADMIN':
+              return user.isAdmin
+            case 'MANAGER':
+              return user.isManager
+            case 'USER':
+              return user.isUser
+            default:
+              return false
+          }
+        })
+      })
+      // 只有當子項目不為空時才顯示父項目
+      return hasPermission && item.children.length > 0
+    }
+
+    return hasPermission
   })
 })
 
