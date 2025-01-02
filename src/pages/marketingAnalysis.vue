@@ -1881,19 +1881,8 @@ import { useRouter } from 'vue-router'
 import { definePage } from 'vue-router/auto'
 import UserRole from '@/enums/UserRole'
 import html2pdf from 'html2pdf.js'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { PieChart, BarChart } from 'echarts/charts'
-import {
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-  DataZoomComponent,
-  ToolboxComponent
-} from 'echarts/components'
+import * as echarts from 'echarts'
 import VChart from 'vue-echarts'
-import * as echarts from 'echarts/core'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 
@@ -3622,17 +3611,17 @@ const barChartOption = computed(() => {
 })
 
 // 註冊必要的 ECharts 組件
-use([
-  CanvasRenderer,
-  PieChart,
-  BarChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
-  GridComponent,
-  DataZoomComponent,
-  ToolboxComponent
-])
+// use([
+//   CanvasRenderer,
+//   PieChart,
+//   BarChart,
+//   TitleComponent,
+//   TooltipComponent,
+//   LegendComponent,
+//   GridComponent,
+//   DataZoomComponent,
+//   ToolboxComponent
+// ])
 
 // 在 script setup 中添加
 const pieChart = ref(null)
