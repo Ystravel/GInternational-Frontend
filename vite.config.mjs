@@ -72,16 +72,5 @@ export default defineConfig({
         api: 'modern-compiler',
       },
     },
-  },
-  build: {
-    rollupOptions: {
-      external: ['echarts', 'vue-echarts'],
-      output: {
-        globals: {
-          echarts: 'echarts',
-          'vue-echarts': 'VueECharts'
-        }
-      }
-    }
   }
 })
