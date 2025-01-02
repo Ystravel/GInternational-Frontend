@@ -37,7 +37,7 @@ h6 {
 }
 
 // 一般輸入框樣式
-.v-field:not(.v-textarea .v-field) {
+.v-field:not(.v-textarea .v-field):not(.v-autocomplete .v-field) {
   .v-field__input {
     font-size: 13px;
     height: 36px !important;
@@ -51,6 +51,12 @@ h6 {
 
 // 文本區域特殊處理
 .v-textarea {
+  .v-field__input {
+    font-size: 13px;
+  }
+}
+
+.v-autocomplete {
   .v-field__input {
     font-size: 13px;
   }
@@ -121,7 +127,7 @@ h3 {
     font-size: 16px;
   }
 
-  .v-field:not(.v-textarea .v-field) {
+  .v-field:not(.v-textarea .v-field):not(.v-autocomplete .v-field) {
     .v-field__input {
         font-size: 14px;
         height: 40px !important;
@@ -134,6 +140,12 @@ h3 {
   }
 
   .v-textarea {
+    .v-field__input {
+        font-size: 14px;
+    }
+  }
+
+  .v-autocomplete {
     .v-field__input {
         font-size: 14px;
     }
