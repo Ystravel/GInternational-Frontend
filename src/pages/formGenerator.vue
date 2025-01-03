@@ -197,7 +197,7 @@
                 :loading="isDownloading"
                 @click="downloadPDF"
               >
-                下載 PDF
+                匯出 PDF
               </v-btn>
             </div>
             <v-divider class="mt-8 mx-6" />
@@ -741,7 +741,7 @@
       @confirm="confirmDelete"
     />
 
-    <!-- 表單歷史紀錄確認下載 PDF 檔對話框 -->
+    <!-- 表單歷史紀錄確認匯出 PDF 檔對話框 -->
     <v-dialog
       v-model="confirmDownloadDialog.open"
       max-width="340"
@@ -992,11 +992,11 @@ const handleTemplateChange = async (templateId) => {
   try {
     // 開始載入，顯示載入動畫
     isTemplateLoading.value = true
-    // 先設置 previewReady 為 false，避免在載入過程中顯示不完整的資料
+    // 重置所有狀態
     previewReady.value = false
     currentTemplate.value = null
-    // 禁用表單驗證
     enableValidation.value = false
+    formData.value = {}
     
     // 獲取模板資訊
     const { data } = await apiAuth.get(`/formTemplates/${templateId}`)
@@ -1005,80 +1005,76 @@ const handleTemplateChange = async (templateId) => {
       console.log('選擇的模板:', template)
       const components = templateComponents[template.componentName]
       if (components) {
-        // 先設置新的 formData，再設置模板
-        formData.value = { ...components.schema }
-
-        // 獲取下一個單號
         try {
+          // 先獲取單號，確保有單號才繼續
+          let quotationNumber = null
+          
           switch (template.componentName) {
             case 'RayHuangQuotationTemplate': {
-              // 獲取銳皇報價單的下一個單號
               const response = await apiAuth.get('/forms/ray-huang-quotation/next-number', {params: {templateId}})
               if (response.data.success) {
-                formData.value.quotationNumber = response.data.result
+                quotationNumber = response.data.result
               }
               break
             }
             case 'YstravelQuotationTemplate': {
-              // 獲取永信旅遊報價單的下一個單號
               const response = await apiAuth.get('/forms/ystravel-quotation/next-number', {params: {templateId}})
               if (response.data.success) {
-                formData.value.quotationNumber = response.data.result
+                quotationNumber = response.data.result
               }
               break
             }
             default:
-              console.error('未知的模板類型:', template.componentName)
-              createSnackbar({
-                text: '無法生成單號：未知的模板類型',
-                snackbarProps: { color: 'red-lighten-1' }
-              })
+              throw new Error('未知的模板類型')
           }
-          
-          // 所有資料都準備好後，再設置模板和 previewReady
-          currentTemplate.value = components.preview
-          // 使用 nextTick 確保 DOM 更新後再顯示
+
+          if (!quotationNumber) {
+            throw new Error('無法取得單號')
+          }
+
+          // 單號取得成功後，再設置表單資料
+          formData.value = { 
+            ...components.schema,
+            quotationNumber 
+          }
+
+          // 等待資料設置完成
           await nextTick()
-          previewReady.value = true
-          // 啟用表單驗證
+
+          // 設置模板和預覽
+          currentTemplate.value = components.preview
+
+          // 再次等待 DOM 更新
+          await nextTick()
+
+          // 最後才啟用驗證和顯示內容
           enableValidation.value = true
+          previewReady.value = true
+
         } catch (error) {
           console.error('取得單號失敗:', error)
           createSnackbar({
             text: '取得單號失敗',
             snackbarProps: { color: 'red-lighten-1' }
           })
-          // 即使取得單號失敗，仍然顯示表單
-          currentTemplate.value = components.preview
-          await nextTick()
-          previewReady.value = true
-          // 啟用表單驗證
-          enableValidation.value = true
+          throw error // 向上拋出錯誤，讓外層統一處理
         }
       } else {
-        console.error('找不到對應的組件:', template.componentName)
-        currentTemplate.value = null
-        formData.value = {}
-        previewReady.value = false
-        enableValidation.value = false
-        createSnackbar({
-          text: '找不到對應的組件',
-          snackbarProps: { color: 'red-lighten-1' }
-        })
+        throw new Error('找不到對應的組件')
       }
     }
   } catch (error) {
-    console.error('載入模板失敗:', error)
+    console.error('載入失敗:', error)
+    // 統一的錯誤處理
     currentTemplate.value = null
     formData.value = {}
     previewReady.value = false
-    enableValidation.value = false
     createSnackbar({
-      text: '載入模板失敗',
+      text: error.message || '載入失敗',
       snackbarProps: { color: 'red-lighten-1' }
     })
   } finally {
-    // 結束載入，隱藏載入動畫
+    // 最後才關閉 loading
     isTemplateLoading.value = false
   }
 }
@@ -1312,7 +1308,7 @@ const downloadPDF = async () => {
           }
         })
 
-        // 4. 下載 PDF
+        // 4. 匯出 PDF
         const link = document.createElement('a')
         link.href = URL.createObjectURL(pdfBlob)
         link.download = `${templateName}_${formData.value.quotationNumber}.pdf`
@@ -1956,9 +1952,9 @@ const downloadHistoryPDF = async (history) => {
       url: history.pdfUrl
     }
   } catch (error) {
-    console.error('下載 PDF 失敗:', error)
+    console.error('匯出 PDF 失敗:', error)
     createSnackbar({
-      text: '下載 PDF 失敗',
+      text: '匯出 PDF 失敗',
       snackbarProps: { color: 'red-lighten-1' }
     })
   }
@@ -1971,7 +1967,7 @@ const confirmDownloadDialog = ref({
   formNumber: ''
 })
 
-// 確認下載 PDF
+// 確認匯出 PDF
 const confirmDownloadPDF = async () => {
   try {
     // 如果是歷史記錄的 PDF 下載

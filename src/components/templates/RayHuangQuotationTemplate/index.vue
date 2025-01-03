@@ -10,7 +10,7 @@
           <div class="d-flex justify-space-between pe-4 title-content">
             <h2>專案報價單</h2>
             <div>
-              <p><span style="font-weight: bold;">No.</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ formData.quotationNumber }}</p>
+              <p><span style="font-weight: bold;">No.</span>&nbsp;{{ formData.quotationNumber }}</p>
               <p><span style="font-weight: bold;">報價日期：</span>{{ formatDate(formData.date) }}</p>
             </div>
           </div>
