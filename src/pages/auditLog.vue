@@ -262,7 +262,6 @@
                     </div>
                   </td>
                   <td
-                    v-if="!lgAndUp"
                     class="text-center"
                   >
                     <v-icon
@@ -473,7 +472,7 @@ const filteredHeaders = computed(() => {
     )
   }
   if (lgAndUp.value) {
-    return tableHeaders.filter(header => !['actions'].includes(header.key))
+    return tableHeaders
   }
   return tableHeaders.filter(header => header.key !== 'changes')
 })
